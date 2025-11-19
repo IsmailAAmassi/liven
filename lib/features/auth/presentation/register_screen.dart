@@ -61,7 +61,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.registerAppBar)),
+      appBar: AppBar(
+        title: AppText(
+          l10n.registerAppBar,
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -145,7 +150,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         ),
                         recognizer: _termsRecognizer
                           ..onTap = () {
-                            ref.read(appRouterProvider).go(TermsOfUseScreen.routePath);
+                            ref.read(appRouterProvider).push(TermsOfUseScreen.routePath);
                           },
                       ),
                     ],

@@ -145,6 +145,11 @@ abstract class AppLocalizations {
   String get settingsLanguageLabel;
   String get settingsTermsLabel;
   String get settingsLogoutLabel;
+  String get logoutConfirmationTitle;
+  String get logoutConfirmationMessage;
+  String get logoutConfirmationCancel;
+  String get logoutConfirmationConfirm;
+  String get mainBackToExitMessage;
   String get forgotPasswordDescription;
   String get errorInvalidCredentials;
   String get errorInvalidRegistration;
