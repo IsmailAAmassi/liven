@@ -1,6 +1,6 @@
 # Zoom Video SDK configuration guide
 
-This document explains how to configure the in-app Zoom experience that powers the **Join Zoom session** card on the home tab.
+This document explains how to configure the in-app Zoom experience that powers the **Join Zoom session** card on the home tab. The Flutter layer depends on [`flutter_zoom_videosdk`](https://pub.dev/packages/flutter_zoom_videosdk) version `^2.3.0`, which is already declared inside `pubspec.yaml`.
 
 ## 1. Create Zoom Video SDK credentials
 
@@ -89,6 +89,8 @@ Additional reminders:
 5. Capture device logs when debugging:
    - Android: `adb logcat | grep ZoomVideoSDK`
    - iOS: Xcode > **View Device Logs**
+
+If the plugin fails to initialize (for example on unsupported platforms or emulators missing native binaries), the **Join Zoom session** card will display an error message but the rest of the application continues to function normally. Simply fix the environment and tap the button again to retry the initialization.
 
 ## 6. Troubleshooting
 

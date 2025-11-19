@@ -20,6 +20,7 @@
   "homeZoomJoinButton": "Join Zoom session",
   "homeZoomMissingConfig": "Provide session name, token, and username via --dart-define or remote config before joining.",
   "homeZoomError": "Unable to open Zoom right now. Double-check your configuration and try again.",
+  "homeZoomInitError": "Zoom calling isn't supported on this device yet. Please try again on a supported build.",
   "homeFeedTitle": "Latest updates",
   "homeFeedPlaceholderTitle": "Placeholder update",
   "homeFeedPlaceholderSubtitle": "Content will arrive once backend is connected.",

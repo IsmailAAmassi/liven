@@ -88,7 +88,9 @@ class HomeTabScreen extends ConsumerWidget {
                 if (zoomState.hasError) ...[
                   const SizedBox(height: 12),
                   Text(
-                    l10n.homeZoomError,
+                    zoomState.error is ZoomInitializationException
+                        ? l10n.homeZoomInitError
+                        : l10n.homeZoomError,
                     style: Theme.of(context)
                         .textTheme
                         .bodySmall

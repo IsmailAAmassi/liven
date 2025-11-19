@@ -20,7 +20,7 @@ The project ships with Riverpod, GoRouter, localization stubs, and custom UI com
 
 ## Zoom Video SDK integration
 
-Zoom calling is available directly from the home tab through the official `zoom_videosdk` plugin. All runtime credentials are pulled from `--dart-define` values, so no secrets are committed to the repo. Review [`docs/zoom_setup.md`](docs/zoom_setup.md) for:
+Zoom calling is available directly from the home tab through the official `flutter_zoom_videosdk` plugin. All runtime credentials are pulled from `--dart-define` values, so no secrets are committed to the repo. Review [`docs/zoom_setup.md`](docs/zoom_setup.md) for:
 
 - Required environment variables (`ZOOM_SESSION_*` and `ZOOM_SDK_*`).
 - Android and iOS native configuration (permissions, Gradle repositories, plist keys).

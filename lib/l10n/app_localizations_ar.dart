@@ -49,6 +49,9 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get homeZoomError => 'تعذر فتح Zoom الآن. تحقق من الإعدادات وحاول مجددًا.';
   @override
+  String get homeZoomInitError =>
+      'خدمة Zoom غير متاحة على هذا الجهاز حاليًا. جرّب مرة أخرى على إصدار مدعوم.';
+  @override
   String get homeFeedTitle => 'آخر التحديثات';
   @override
   String get homeFeedPlaceholderTitle => 'تحديث تجريبي';
