@@ -25,6 +25,16 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get navMore => 'المزيد';
   @override
+  String get webviewErrorTitle => 'تعذّر تحميل المحتوى';
+  @override
+  String get webviewErrorMessage =>
+      'لم نتمكن من تحميل تجربة ليفن عبر الويب. تأكد من اتصالك ثم أعد المحاولة.';
+  @override
+  String get webviewConfigError =>
+      'عنوان الصفحة غير مهيأ. تأكد من قيمة ‎APP_HOME_WEB_URL‎ في الإعدادات.';
+  @override
+  String get webviewRetryButton => 'إعادة المحاولة';
+  @override
   String get homeWelcomeTitle => 'مرحبًا 👋';
   @override
   String get homeWelcomeSubtitle =>
