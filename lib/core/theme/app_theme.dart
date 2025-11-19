@@ -42,7 +42,7 @@ class AppTheme {
           color: colorScheme.onSurface,
         ),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 0,
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
