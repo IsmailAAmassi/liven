@@ -7,8 +7,6 @@ import 'l10n/l10n.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 
-final _router = createRouter();
-
 class App extends ConsumerWidget {
   const App({super.key});
 
@@ -16,13 +14,14 @@ class App extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
     final locale = ref.watch(localeProvider);
+    final router = ref.watch(appRouterProvider);
 
     return MaterialApp.router(
       title: 'Starter App',
       themeMode: themeMode,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      routerConfig: _router,
+      routerConfig: router,
       locale: locale,
       supportedLocales: supportedLocales,
       localizationsDelegates: AppLocalizations.localizationsDelegates,

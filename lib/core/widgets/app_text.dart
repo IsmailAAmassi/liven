@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../theme/app_typography.dart';
-
 class AppText extends StatelessWidget {
   const AppText(
     this.data, {
@@ -20,7 +18,7 @@ class AppText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       data,
-      style: style ?? Theme.of(context).textTheme.bodyMedium ?? AppTextStyles.body,
+      style: style ?? Theme.of(context).textTheme.bodyMedium,
       textAlign: textAlign,
       maxLines: maxLines,
     );
