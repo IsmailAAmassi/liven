@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../l10n/app_localizations.dart';
+
 class TermsOfUseScreen extends StatelessWidget {
   const TermsOfUseScreen({super.key});
 
@@ -8,21 +10,20 @@ class TermsOfUseScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text('Terms of Use')),
+      appBar: AppBar(title: Text(l10n.termsTitle)),
       body: ListView(
         padding: const EdgeInsets.all(24),
-        children: const [
+        children: [
           Text(
-            'By using Liven you agree to respect our community guidelines, '
-            'protect your personal information, and refrain from sharing '
-            'sensitive data in public spaces. These terms are placeholders '
-            'for the legal copy that will be provided later.',
+            l10n.termsParagraphOne,
+            style: Theme.of(context).textTheme.bodyLarge,
           ),
-          SizedBox(height: 24),
+          const SizedBox(height: 24),
           Text(
-            'Your privacy and security are important to us. We keep all data on '
-            'your device for this demo build and never send it to an external backend.',
+            l10n.termsParagraphTwo,
+            style: Theme.of(context).textTheme.bodyLarge,
           ),
         ],
       ),

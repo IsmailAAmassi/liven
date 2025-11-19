@@ -2,7 +2,7 @@ class FakeAuthService {
   Future<void> login({required String identifier, required String password}) async {
     await Future.delayed(const Duration(milliseconds: 600));
     if (identifier.isEmpty || password.isEmpty) {
-      throw const FakeAuthException('Please enter valid credentials.');
+      throw const FakeAuthException(FakeAuthError.invalidCredentials);
     }
   }
 
@@ -13,14 +13,14 @@ class FakeAuthService {
   }) async {
     await Future.delayed(const Duration(milliseconds: 800));
     if (name.isEmpty || email.isEmpty || password.length < 6) {
-      throw const FakeAuthException('Please provide valid registration data.');
+      throw const FakeAuthException(FakeAuthError.invalidRegistration);
     }
   }
 
   Future<void> requestPasswordReset(String identifier) async {
     await Future.delayed(const Duration(milliseconds: 600));
     if (identifier.isEmpty) {
-      throw const FakeAuthException('Identifier is required.');
+      throw const FakeAuthException(FakeAuthError.identifierRequired);
     }
   }
 
@@ -30,22 +30,31 @@ class FakeAuthService {
   }) async {
     await Future.delayed(const Duration(milliseconds: 600));
     if (identifier.isEmpty || password.length < 6) {
-      throw const FakeAuthException('Invalid reset data.');
+      throw const FakeAuthException(FakeAuthError.invalidResetData);
     }
   }
 
   Future<void> verifyOtp(String code) async {
     await Future.delayed(const Duration(milliseconds: 400));
     if (code != '123456') {
-      throw const FakeAuthException('Incorrect OTP code.');
+      throw const FakeAuthException(FakeAuthError.incorrectOtp);
     }
   }
 }
 
+enum FakeAuthError {
+  invalidCredentials,
+  invalidRegistration,
+  identifierRequired,
+  invalidResetData,
+  incorrectOtp,
+}
+
 class FakeAuthException implements Exception {
-  const FakeAuthException(this.message);
-  final String message;
+  const FakeAuthException(this.error);
+
+  final FakeAuthError error;
 
   @override
-  String toString() => message;
+  String toString() => error.name;
 }

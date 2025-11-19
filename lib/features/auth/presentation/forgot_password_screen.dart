@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/app_text_field.dart';
+import '../../../l10n/app_localizations.dart';
 import 'auth_view_model.dart';
 
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
@@ -37,9 +38,10 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(authViewModelProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Forgot password')),
+      appBar: AppBar(title: Text(l10n.forgotPasswordAppBar)),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -49,16 +51,21 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               shrinkWrap: true,
               children: [
                 AppText(
-                  'Request reset link',
+                  l10n.forgotPasswordTitle,
                   style: Theme.of(context).textTheme.headlineSmall,
+                ),
+                const SizedBox(height: 12),
+                AppText(
+                  l10n.forgotPasswordDescription,
+                  style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 24),
                 AppTextField(
-                  label: 'Email or phone',
+                  label: l10n.fieldEmailOrPhone,
                   controller: _identifierController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Enter your account email or phone.';
+                      return l10n.validationEmailOrPhone;
                     }
                     return null;
                   },
@@ -72,7 +79,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                 ],
                 const SizedBox(height: 24),
                 AppButton(
-                  label: 'Send OTP',
+                  label: l10n.sendOtpButton,
                   onPressed: _submit,
                   isLoading: state.isLoading,
                 ),

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
+import '../../../l10n/app_localizations.dart';
 import 'auth_view_model.dart';
 
 class ResetPasswordScreen extends ConsumerStatefulWidget {
@@ -41,9 +42,10 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(authViewModelProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Reset password')),
+      appBar: AppBar(title: Text(l10n.resetPasswordAppBar)),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -53,24 +55,24 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
               shrinkWrap: true,
               children: [
                 AppTextField(
-                  label: 'New password',
+                  label: l10n.fieldNewPassword,
                   controller: _passwordController,
                   obscureText: true,
                   validator: (value) {
                     if (value == null || value.length < 6) {
-                      return 'Password must be at least 6 characters';
+                      return l10n.validationPasswordLength;
                     }
                     return null;
                   },
                 ),
                 const SizedBox(height: 16),
                 AppTextField(
-                  label: 'Confirm password',
+                  label: l10n.fieldConfirmPassword,
                   controller: _confirmController,
                   obscureText: true,
                   validator: (value) {
                     if (value != _passwordController.text) {
-                      return 'Passwords do not match';
+                      return l10n.validationPasswordsMismatch;
                     }
                     return null;
                   },
@@ -84,7 +86,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                 ],
                 const SizedBox(height: 24),
                 AppButton(
-                  label: 'Reset password',
+                  label: l10n.resetPasswordButton,
                   onPressed: _submit,
                   isLoading: state.isLoading,
                 ),

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/config/app_enums.dart';
 import '../../../core/config/app_providers.dart';
 import '../../../core/router/app_router.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../auth/presentation/login_screen.dart';
 import '../../main/presentation/main_screen.dart';
 import '../data/onboarding_repository.dart';
@@ -18,43 +19,73 @@ class OnboardingState {
   }
 }
 
+enum OnboardingPageType { language, theme, content }
+
 class OnboardingPageData {
   const OnboardingPageData({
-    required this.title,
-    required this.description,
+    required this.titleBuilder,
+    required this.descriptionBuilder,
     required this.icon,
     required this.background,
     required this.featureColor,
   });
 
-  final String title;
-  final String description;
+  final String Function(AppLocalizations) titleBuilder;
+  final String Function(AppLocalizations) descriptionBuilder;
   final IconData icon;
   final Color background;
   final Color featureColor;
 }
 
+class OnboardingPageConfig {
+  const OnboardingPageConfig.language()
+      : type = OnboardingPageType.language,
+        data = null,
+        background = const Color(0xFFF4F1FF);
+
+  const OnboardingPageConfig.theme()
+      : type = OnboardingPageType.theme,
+        data = null,
+        background = const Color(0xFFEFF6FB);
+
+  const OnboardingPageConfig.content(this.data)
+      : type = OnboardingPageType.content,
+        background = data.background;
+
+  final OnboardingPageType type;
+  final OnboardingPageData? data;
+  final Color background;
+}
+
 final onboardingPages = [
-  const OnboardingPageData(
-    title: 'Discover tailored experiences',
-    description: 'Personalized content crafted for both Arabic and English audiences.',
-    icon: Icons.auto_awesome,
-    background: Color(0xFFFAF5FF),
-    featureColor: Color(0xFF6D2E75),
+  const OnboardingPageConfig.language(),
+  const OnboardingPageConfig.theme(),
+  OnboardingPageConfig.content(
+    OnboardingPageData(
+      titleBuilder: (l10n) => l10n.onboardingPageOneTitle,
+      descriptionBuilder: (l10n) => l10n.onboardingPageOneDescription,
+      icon: Icons.auto_awesome,
+      background: const Color(0xFFFAF5FF),
+      featureColor: const Color(0xFF6D2E75),
+    ),
   ),
-  const OnboardingPageData(
-    title: 'Stay in sync everywhere',
-    description: 'Access your account on any device with secure cloud sync.',
-    icon: Icons.devices_other,
-    background: Color(0xFFEFE7F2),
-    featureColor: Color(0xFF835690),
+  OnboardingPageConfig.content(
+    OnboardingPageData(
+      titleBuilder: (l10n) => l10n.onboardingPageTwoTitle,
+      descriptionBuilder: (l10n) => l10n.onboardingPageTwoDescription,
+      icon: Icons.devices_other,
+      background: const Color(0xFFEFE7F2),
+      featureColor: const Color(0xFF835690),
+    ),
   ),
-  const OnboardingPageData(
-    title: 'Control every detail',
-    description: 'Themes, language, and privacy controls are always one tap away.',
-    icon: Icons.tune,
-    background: Color(0xFFF6EDF8),
-    featureColor: Color(0xFFAA6FAD),
+  OnboardingPageConfig.content(
+    OnboardingPageData(
+      titleBuilder: (l10n) => l10n.onboardingPageThreeTitle,
+      descriptionBuilder: (l10n) => l10n.onboardingPageThreeDescription,
+      icon: Icons.tune,
+      background: const Color(0xFFF6EDF8),
+      featureColor: const Color(0xFFAA6FAD),
+    ),
   ),
 ];
 
