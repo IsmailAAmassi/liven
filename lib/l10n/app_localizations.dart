@@ -46,6 +46,11 @@ abstract class AppLocalizations {
   String get homeCardTitle;
   String get homeCardDescription;
   String get homeOpenSettings;
+  String get homeZoomCardTitle;
+  String get homeZoomCardDescription;
+  String get homeZoomJoinButton;
+  String get homeZoomMissingConfig;
+  String get homeZoomError;
   String get homeFeedTitle;
   String get homeFeedPlaceholderTitle;
   String get homeFeedPlaceholderSubtitle;

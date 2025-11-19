@@ -34,15 +34,21 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>UISupportedInterfaceOrientations~ipad</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>CADisableMinimumFrameDurationOnPhone</key>
-	<true/>
+<key>UISupportedInterfaceOrientations~ipad</key>
+<array>
+<string>UIInterfaceOrientationPortrait</string>
+<string>UIInterfaceOrientationPortraitUpsideDown</string>
+<string>UIInterfaceOrientationLandscapeLeft</string>
+<string>UIInterfaceOrientationLandscapeRight</string>
+</array>
+<key>NSCameraUsageDescription</key>
+<string>Camera access is required to share video during Zoom meetings.</string>
+<key>NSMicrophoneUsageDescription</key>
+<string>Microphone access is required to speak during Zoom meetings.</string>
+<key>NSBluetoothAlwaysUsageDescription</key>
+<string>Bluetooth is used to route audio to wireless headsets in Zoom meetings.</string>
+<key>CADisableMinimumFrameDurationOnPhone</key>
+<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 </dict>

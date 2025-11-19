@@ -37,6 +37,19 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get homeOpenSettings => 'Open settings';
   @override
+  String get homeZoomCardTitle => 'Meet live on Zoom';
+  @override
+  String get homeZoomCardDescription =>
+      'Launch the Zoom Video SDK experience directly from Liven using your organization credentials.';
+  @override
+  String get homeZoomJoinButton => 'Join Zoom session';
+  @override
+  String get homeZoomMissingConfig =>
+      'Provide session name, token, and username via --dart-define or remote config before joining.';
+  @override
+  String get homeZoomError =>
+      'Unable to open Zoom right now. Double-check your configuration and try again.';
+  @override
   String get homeFeedTitle => 'Latest updates';
   @override
   String get homeFeedPlaceholderTitle => 'Placeholder update';

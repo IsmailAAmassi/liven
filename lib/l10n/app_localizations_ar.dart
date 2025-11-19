@@ -37,6 +37,18 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get homeOpenSettings => 'فتح الإعدادات';
   @override
+  String get homeZoomCardTitle => 'اجتماعات عبر Zoom';
+  @override
+  String get homeZoomCardDescription =>
+      'ابدأ جلسة Zoom Video SDK مباشرة من لايفن باستخدام بيانات الاعتماد الخاصة بمؤسستك.';
+  @override
+  String get homeZoomJoinButton => 'الانضمام إلى جلسة Zoom';
+  @override
+  String get homeZoomMissingConfig =>
+      'يرجى تزويد التطبيق باسم الجلسة والرمز واسم المستخدم عبر ‎--dart-define‎ قبل الانضمام.';
+  @override
+  String get homeZoomError => 'تعذر فتح Zoom الآن. تحقق من الإعدادات وحاول مجددًا.';
+  @override
   String get homeFeedTitle => 'آخر التحديثات';
   @override
   String get homeFeedPlaceholderTitle => 'تحديث تجريبي';
