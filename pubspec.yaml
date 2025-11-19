@@ -16,7 +16,7 @@ dependencies:
   go_router: ^14.2.1
   intl: ^0.20.2
   shared_preferences: ^2.5.3
-  zoom_videosdk: ^1.8.0+1
+  flutter_zoom_videosdk: ^2.3.0
 
 dev_dependencies:
   flutter_test:
