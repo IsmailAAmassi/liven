@@ -25,10 +25,9 @@ class RealAuthService implements AuthRepository {
     required String identifier,
     required String password,
   }) async {
-    final response = await _apiClient.post(_loginPath, body: {
-      'identifier': identifier,
-      'password': password,
-    });
+    final payload = _identifierPayload(identifier)
+      ..['password'] = password;
+    final response = await _apiClient.post(_loginPath, body: payload);
     if (response.isSuccessful) {
       return await _handleAuthSuccess(response.data);
     }
@@ -54,9 +53,10 @@ class RealAuthService implements AuthRepository {
 
   @override
   Future<EmptyResult> requestPasswordReset(String identifier) async {
-    final response = await _apiClient.post(_requestResetPath, body: {
-      'identifier': identifier,
-    });
+    final response = await _apiClient.post(
+      _sendOtpPath,
+      body: _identifierPayload(identifier),
+    );
     return _handleEmptyResult(response);
   }
 
@@ -73,10 +73,9 @@ class RealAuthService implements AuthRepository {
     required String identifier,
     required String password,
   }) async {
-    final response = await _apiClient.post(_resetPasswordPath, body: {
-      'identifier': identifier,
-      'password': password,
-    });
+    final payload = _identifierPayload(identifier)
+      ..['password'] = password;
+    final response = await _apiClient.post(_resetPasswordPath, body: payload);
     return _handleEmptyResult(response);
   }
 
@@ -140,11 +139,23 @@ class RealAuthService implements AuthRepository {
     return <String, dynamic>{};
   }
 
-  String get _loginPath => '/auth/login';
-  String get _registerPath => '/auth/register';
-  String get _requestResetPath => '/auth/password/reset-request';
-  String get _verifyOtpPath => '/auth/otp/verify';
-  String get _resetPasswordPath => '/auth/password/reset';
-  String get _logoutPath => '/auth/logout';
-  String get _refreshPath => '/auth/refresh';
+  Map<String, dynamic> _identifierPayload(String identifier) {
+    final payload = <String, dynamic>{
+      'identifier': identifier,
+    };
+    if (identifier.contains('@')) {
+      payload['email'] = identifier;
+    } else {
+      payload['phone'] = identifier;
+    }
+    return payload;
+  }
+
+  String get _loginPath => '/mobile/login';
+  String get _registerPath => '/mobile/register';
+  String get _sendOtpPath => '/mobile/user/otp/send';
+  String get _verifyOtpPath => '/mobile/user/otp/verify';
+  String get _resetPasswordPath => '/mobile/user/password/forget/update';
+  String get _logoutPath => '/mobile/logout';
+  String get _refreshPath => '/mobile/token/refresh';
 }
