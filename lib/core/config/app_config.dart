@@ -3,7 +3,7 @@ class AppConfig {
 
   static const String baseUrl = String.fromEnvironment(
     'APP_BASE_URL',
-    defaultValue: 'https://api.example.com',
+    defaultValue: 'https://liven-sa.com/api',
   );
 
   static final bool useFakeAuth = _parseBool(
