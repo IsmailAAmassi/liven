@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/config/app_providers.dart';
 import '../../../../core/permissions/app_permission.dart';
 import '../../../../core/router/app_router.dart';
-import '../../../../core/services/zoom_service.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_text.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -48,15 +47,12 @@ class _HomeTabScreenState extends ConsumerState<HomeTabScreen> {
     if (!granted) {
       return;
     }
-    await ref.read(zoomMeetingControllerProvider.notifier).joinPresetMeeting();
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    final zoomState = ref.watch(zoomMeetingControllerProvider);
-    final zoomPreset = ref.watch(zoomMeetingPresetProvider);
 
     return ListView(
       padding: const EdgeInsets.all(24),
@@ -112,7 +108,7 @@ class _HomeTabScreenState extends ConsumerState<HomeTabScreen> {
                   l10n.homeZoomCardDescription,
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
-                if (!zoomPreset.isConfigured) ...[
+                if (false) ...[
                   const SizedBox(height: 12),
                   Text(
                     l10n.homeZoomMissingConfig,
@@ -122,23 +118,15 @@ class _HomeTabScreenState extends ConsumerState<HomeTabScreen> {
                         ?.copyWith(color: Theme.of(context).colorScheme.error),
                   ),
                 ],
-                if (zoomState.hasError) ...[
+                if (false) ...[
                   const SizedBox(height: 12),
-                  Text(
-                    zoomState.error is ZoomInitializationException
-                        ? l10n.homeZoomInitError
-                        : l10n.homeZoomError,
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodySmall
-                        ?.copyWith(color: Theme.of(context).colorScheme.error),
-                  ),
+
                 ],
                 const SizedBox(height: 16),
                 AppButton(
                   label: l10n.homeZoomJoinButton,
-                  isLoading: zoomState.isLoading,
-                  onPressed: zoomPreset.isConfigured ? _handleJoinZoom : null,
+                  isLoading: false,
+                  onPressed: false ? _handleJoinZoom : null,
                 ),
               ],
             ),
