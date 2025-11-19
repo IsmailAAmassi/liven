@@ -263,6 +263,17 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get settingsLogoutLabel => 'تسجيل الخروج';
   @override
+  String get logoutConfirmationTitle => 'تأكيد تسجيل الخروج';
+  @override
+  String get logoutConfirmationMessage =>
+      'هل أنت متأكد من رغبتك في تسجيل الخروج؟';
+  @override
+  String get logoutConfirmationCancel => 'إلغاء';
+  @override
+  String get logoutConfirmationConfirm => 'تسجيل الخروج';
+  @override
+  String get mainBackToExitMessage => 'اضغط رجوع مرة أخرى للخروج';
+  @override
   String get forgotPasswordDescription =>
       'أدخل المعرف المستخدم في حسابك للحصول على رمز إعادة التعيين.';
   @override
