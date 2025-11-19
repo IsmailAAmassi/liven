@@ -18,6 +18,11 @@ flutter run
 
 The project ships with Riverpod, GoRouter, localization stubs, and custom UI components so you can start wiring real features immediately.
 
+## Environment configuration
+
+Use the provided Dart define files under `env/` to toggle between fake and real auth implementations (or to change the API base URL).
+See [`docs/env.md`](docs/env.md) for the list of available files and detailed run/build commands with `--dart-define-from-file`.
+
 ## Zoom Video SDK integration
 
 Zoom calling is available directly from the home tab through the official `flutter_zoom_videosdk` plugin. All runtime credentials are pulled from `--dart-define` values, so no secrets are committed to the repo. Review [`docs/zoom_setup.md`](docs/zoom_setup.md) for:
