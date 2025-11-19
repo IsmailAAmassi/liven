@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../core/widgets/app_page_app_bar.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../main/presentation/main_screen.dart';
 
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
@@ -12,7 +15,10 @@ class AboutScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.moreAbout)),
+      appBar: AppPageAppBar(
+        title: l10n.moreAbout,
+        onBackPressed: () => context.go(MainScreen.routePath),
+      ),
       body: ListView(
         padding: const EdgeInsets.all(24),
         children: [

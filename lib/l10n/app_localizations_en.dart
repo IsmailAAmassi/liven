@@ -265,6 +265,17 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsLogoutLabel => 'Logout';
   @override
+  String get logoutConfirmationTitle => 'Confirm logout';
+  @override
+  String get logoutConfirmationMessage =>
+      'Are you sure you want to logout?';
+  @override
+  String get logoutConfirmationCancel => 'Cancel';
+  @override
+  String get logoutConfirmationConfirm => 'Logout';
+  @override
+  String get mainBackToExitMessage => 'Press back again to exit';
+  @override
   String get forgotPasswordDescription =>
       'Enter the identifier used on your account to receive a reset code.';
   @override

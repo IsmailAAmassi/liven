@@ -41,7 +41,12 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.forgotPasswordAppBar)),
+      appBar: AppBar(
+        title: AppText(
+          l10n.forgotPasswordAppBar,
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),

@@ -6,6 +6,7 @@ import '../../../core/config/app_providers.dart';
 import '../../../core/router/app_router.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../auth/presentation/auth_view_model.dart';
+import '../../auth/presentation/widgets/logout_confirmation_dialog.dart';
 import '../../profile/presentation/profile_screen.dart';
 import '../../settings/presentation/settings_screen.dart';
 import '../../settings/presentation/widgets/language_selector_sheet.dart';
@@ -72,13 +73,18 @@ class MoreScreen extends ConsumerWidget {
           leading: const Icon(Icons.settings),
           title: Text(l10n.generalSettings),
           trailing: const Icon(Icons.chevron_right),
-          onTap: () => router.go(SettingsScreen.routePath),
+          onTap: () => router.push(SettingsScreen.routePath),
         ),
         ListTile(
           leading: const Icon(Icons.logout),
           title: Text(l10n.moreLogout),
           subtitle: Text(l10n.moreLogoutSubtitle),
-          onTap: () => ref.read(authViewModelProvider.notifier).logout(),
+          onTap: () async {
+            final confirmed = await showLogoutConfirmationDialog(context);
+            if (confirmed) {
+              await ref.read(authViewModelProvider.notifier).logout();
+            }
+          },
         ),
       ],
     );
