@@ -34,6 +34,11 @@ final onboardingCompletedProvider =
   return OnboardingStatusNotifier(storage);
 });
 
+final mainTabIndexProvider =
+    StateNotifierProvider<MainTabIndexNotifier, int>((ref) {
+  return MainTabIndexNotifier();
+});
+
 class ThemeModeNotifier extends StateNotifier<ThemeMode> {
   ThemeModeNotifier(this._storage) : super(ThemeMode.system) {
     _load();
@@ -128,5 +133,15 @@ class OnboardingStatusNotifier extends StateNotifier<bool> {
   Future<void> reset() async {
     state = false;
     await _storage.setOnboardingCompleted(false);
+  }
+}
+
+class MainTabIndexNotifier extends StateNotifier<int> {
+  MainTabIndexNotifier() : super(2);
+
+  void setIndex(int index) {
+    if (state != index) {
+      state = index;
+    }
   }
 }

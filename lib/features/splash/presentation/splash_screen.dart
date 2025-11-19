@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/config/app_enums.dart';
 import '../../../core/config/app_providers.dart';
 import '../../../core/router/app_router.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../auth/presentation/login_screen.dart';
 import '../../main/presentation/main_screen.dart';
 import '../../onboarding/presentation/onboarding_screen.dart';
@@ -73,7 +74,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
               ),
               const SizedBox(height: 16),
               Text(
-                'Liven',
+                AppLocalizations.of(context)!.appTitle,
                 style: Theme.of(context)
                     .textTheme
                     .headlineMedium

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:liven/features/auth/presentation/auth_view_model.dart';
 
 import '../../features/auth/presentation/forgot_password_screen.dart';
 import '../../features/auth/presentation/login_screen.dart';
@@ -9,7 +8,13 @@ import '../../features/auth/presentation/otp_screen.dart';
 import '../../features/auth/presentation/register_screen.dart';
 import '../../features/auth/presentation/reset_password_screen.dart';
 import '../../features/main/presentation/main_screen.dart';
+import '../../features/main/presentation/tabs/daily_records_tab.dart';
+import '../../features/main/presentation/tabs/home_tab.dart';
+import '../../features/main/presentation/tabs/statistics_tab.dart';
+import '../../features/more/presentation/about_screen.dart';
+import '../../features/more/presentation/more_screen.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
+import '../../features/profile/presentation/profile_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
 import '../../features/splash/presentation/splash_screen.dart';
 import '../../features/terms/presentation/terms_of_use_screen.dart';
@@ -81,10 +86,67 @@ GoRouter createRouter() {
         pageBuilder: (context, state) =>
             _buildPage(state, const TermsOfUseScreen()),
       ),
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return MainScreen(navigationShell: navigationShell);
+        },
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: StatisticsScreen.routePath,
+                name: StatisticsScreen.routeName,
+                pageBuilder: (context, state) =>
+                    _buildPage(state, const StatisticsScreen()),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: DailyRecordsScreen.routePath,
+                name: DailyRecordsScreen.routeName,
+                pageBuilder: (context, state) =>
+                    _buildPage(state, const DailyRecordsScreen()),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: HomeTabScreen.routePath,
+                name: HomeTabScreen.routeName,
+                pageBuilder: (context, state) =>
+                    _buildPage(state, const HomeTabScreen()),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: ProfileScreen.routePath,
+                name: ProfileScreen.routeName,
+                pageBuilder: (context, state) =>
+                    _buildPage(state, const ProfileScreen()),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: MoreScreen.routePath,
+                name: MoreScreen.routeName,
+                pageBuilder: (context, state) =>
+                    _buildPage(state, const MoreScreen()),
+              ),
+            ],
+          ),
+        ],
+      ),
       GoRoute(
-        path: MainScreen.routePath,
-        name: MainScreen.routeName,
-        pageBuilder: (context, state) => _buildPage(state, const MainScreen()),
+        path: AboutScreen.routePath,
+        name: AboutScreen.routeName,
+        pageBuilder: (context, state) => _buildPage(state, const AboutScreen()),
       ),
       GoRoute(
         path: SettingsScreen.routePath,

@@ -5,6 +5,7 @@ import '../../../core/config/app_enums.dart';
 import '../../../core/config/app_providers.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/services/fake_auth_service.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../main/presentation/main_screen.dart';
 import '../data/auth_repository.dart';
 import 'login_screen.dart';
@@ -147,10 +148,23 @@ class AuthViewModel extends StateNotifier<AuthState> {
   }
 
   String _mapError(Object error) {
+    final locale = _ref.read(localeProvider);
+    final l10n = lookupAppLocalizations(locale);
     if (error is FakeAuthException) {
-      return error.message;
+      switch (error.error) {
+        case FakeAuthError.invalidCredentials:
+          return l10n.errorInvalidCredentials;
+        case FakeAuthError.invalidRegistration:
+          return l10n.errorInvalidRegistration;
+        case FakeAuthError.identifierRequired:
+          return l10n.errorIdentifierRequired;
+        case FakeAuthError.invalidResetData:
+          return l10n.errorInvalidResetData;
+        case FakeAuthError.incorrectOtp:
+          return l10n.errorIncorrectOtp;
+      }
     }
     debugPrint('Auth error: $error');
-    return 'Something went wrong. Please try again.';
+    return l10n.errorGeneric;
   }
 }

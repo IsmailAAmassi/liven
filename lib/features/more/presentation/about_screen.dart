@@ -1,0 +1,42 @@
+import 'package:flutter/material.dart';
+
+import '../../../l10n/app_localizations.dart';
+
+class AboutScreen extends StatelessWidget {
+  const AboutScreen({super.key});
+
+  static const routePath = '/about';
+  static const routeName = 'about';
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Scaffold(
+      appBar: AppBar(title: Text(l10n.moreAbout)),
+      body: ListView(
+        padding: const EdgeInsets.all(24),
+        children: [
+          Text(
+            l10n.aboutTitle,
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            l10n.aboutDescription,
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+          const SizedBox(height: 24),
+          Text(
+            l10n.aboutMissionTitle,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            l10n.aboutMissionDescription,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ],
+      ),
+    );
+  }
+}

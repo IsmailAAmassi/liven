@@ -6,6 +6,7 @@ import '../../../core/router/app_router.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/app_text_field.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../terms/presentation/terms_of_use_screen.dart';
 import 'auth_view_model.dart';
 import 'login_screen.dart';
@@ -57,9 +58,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(authViewModelProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Create account')),
+      appBar: AppBar(title: Text(l10n.registerAppBar)),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -69,55 +71,55 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 AppText(
-                  'Join Liven',
+                  l10n.registerTitle,
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
                 const SizedBox(height: 24),
                 AppTextField(
-                  label: 'Full name',
+                  label: l10n.fieldFullName,
                   controller: _nameController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Name is required';
+                      return l10n.validationRequiredField;
                     }
                     return null;
                   },
                 ),
                 const SizedBox(height: 16),
                 AppTextField(
-                  label: 'Email',
+                  label: l10n.fieldEmail,
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Email is required';
+                      return l10n.validationRequiredField;
                     }
                     if (!value.contains('@')) {
-                      return 'Enter a valid email';
+                      return l10n.validationEmail;
                     }
                     return null;
                   },
                 ),
                 const SizedBox(height: 16),
                 AppTextField(
-                  label: 'Password',
+                  label: l10n.fieldPassword,
                   controller: _passwordController,
                   obscureText: true,
                   validator: (value) {
                     if (value == null || value.length < 6) {
-                      return 'Password must be at least 6 characters';
+                      return l10n.validationPasswordLength;
                     }
                     return null;
                   },
                 ),
                 const SizedBox(height: 16),
                 AppTextField(
-                  label: 'Confirm password',
+                  label: l10n.fieldConfirmPassword,
                   controller: _confirmController,
                   obscureText: true,
                   validator: (value) {
                     if (value != _passwordController.text) {
-                      return 'Passwords do not match';
+                      return l10n.validationPasswordsMismatch;
                     }
                     return null;
                   },
@@ -134,9 +136,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   text: TextSpan(
                     style: Theme.of(context).textTheme.bodyMedium,
                     children: [
-                      const TextSpan(text: 'By signing up you agree to our '),
+                      TextSpan(text: l10n.registerTermsPrefix),
                       TextSpan(
-                        text: 'Terms of Use',
+                        text: l10n.registerTermsLink,
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.primary,
                           decoration: TextDecoration.underline,
@@ -151,7 +153,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: 24),
                 AppButton(
-                  label: 'Create account',
+                  label: l10n.registerButton,
                   onPressed: _submit,
                   isLoading: state.isLoading,
                 ),
@@ -160,7 +162,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   onPressed: () {
                     ref.read(appRouterProvider).go(LoginScreen.routePath);
                   },
-                  child: const Text('Already have an account? Login'),
+                  child: Text(l10n.registerLoginCta),
                 ),
               ],
             ),

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/otp_code_input.dart';
+import '../../../l10n/app_localizations.dart';
 import 'auth_view_model.dart';
 
 class OtpScreen extends ConsumerStatefulWidget {
@@ -32,9 +33,10 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(authViewModelProvider);
     final isRegisterFlow = widget.args.flowType == OtpFlowType.register;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Enter OTP')),
+      appBar: AppBar(title: Text(l10n.otpAppBar)),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -45,8 +47,8 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
               children: [
                 AppText(
                   isRegisterFlow
-                      ? 'We have sent a code to ${widget.args.identifier}'
-                      : 'Verify your reset request for ${widget.args.identifier}',
+                      ? l10n.otpRegisterMessage(widget.args.identifier)
+                      : l10n.otpResetMessage(widget.args.identifier),
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 const SizedBox(height: 24),
@@ -66,7 +68,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                 ],
                 const Spacer(),
                 AppButton(
-                  label: 'Verify',
+                  label: l10n.verifyButton,
                   onPressed: _submit,
                   isLoading: state.isLoading,
                 ),

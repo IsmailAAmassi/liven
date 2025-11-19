@@ -5,6 +5,7 @@ import '../../../core/router/app_router.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/app_text_field.dart';
+import '../../../l10n/app_localizations.dart';
 import 'auth_view_model.dart';
 import 'forgot_password_screen.dart';
 import 'register_screen.dart';
@@ -43,6 +44,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authViewModelProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       body: SafeArea(
@@ -54,37 +56,37 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 AppText(
-                  'Welcome back',
+                  l10n.loginTitle,
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
                 const SizedBox(height: 8),
                 AppText(
-                  'Sign in to continue your journey.',
+                  l10n.loginSubtitle,
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 const SizedBox(height: 32),
                 AppTextField(
-                  label: 'Email or phone',
+                  label: l10n.fieldEmailOrPhone,
                   controller: _identifierController,
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your email or phone.';
+                      return l10n.validationEmailOrPhone;
                     }
                     return null;
                   },
                 ),
                 const SizedBox(height: 16),
                 AppTextField(
-                  label: 'Password',
+                  label: l10n.fieldPassword,
                   controller: _passwordController,
                   obscureText: true,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Password is required.';
+                      return l10n.validationRequiredField;
                     }
                     if (value.length < 6) {
-                      return 'Password must be at least 6 characters.';
+                      return l10n.validationPasswordLength;
                     }
                     return null;
                   },
@@ -98,13 +100,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ],
                 const SizedBox(height: 24),
                 AppButton(
-                  label: 'Login',
+                  label: l10n.loginButton,
                   onPressed: _submit,
                   isLoading: authState.isLoading,
                 ),
                 const SizedBox(height: 12),
                 AppButton(
-                  label: 'Browse as guest',
+                  label: l10n.guestButton,
                   onPressed: authState.isLoading
                       ? null
                       : () => ref.read(authViewModelProvider.notifier).browseAsGuest(),
@@ -118,13 +120,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       onPressed: () {
                         ref.read(appRouterProvider).go(RegisterScreen.routePath);
                       },
-                      child: const Text('Register'),
+                      child: Text(l10n.registerLink),
                     ),
                     TextButton(
                       onPressed: () {
                         ref.read(appRouterProvider).go(ForgotPasswordScreen.routePath);
                       },
-                      child: const Text('Forgot Password?'),
+                      child: Text(l10n.forgotPasswordLink),
                     ),
                   ],
                 ),
