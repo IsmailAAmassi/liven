@@ -165,6 +165,12 @@ abstract class AppLocalizations {
   String get errorInvalidResetData;
   String get errorIncorrectOtp;
   String get errorGeneric;
+  String get error_bad_request;
+  String get error_unauthorized;
+  String get error_not_found;
+  String get error_validation;
+  String get error_server;
+  String get error_unknown;
   String get permissionsTitle;
   String get permissionsDescription;
   String get permissionNotificationsName;

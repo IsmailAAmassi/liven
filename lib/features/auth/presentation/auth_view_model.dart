@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/config/app_enums.dart';
 import '../../../core/config/app_providers.dart';
+import '../../../core/network/api_result.dart';
 import '../../../core/router/app_router.dart';
-import '../../../core/services/fake_auth_service.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../main/presentation/main_screen.dart';
 import '../data/auth_repository.dart';
@@ -57,14 +57,15 @@ class AuthViewModel extends StateNotifier<AuthState> {
 
   Future<void> login({required String identifier, required String password}) async {
     state = const AuthState(isLoading: true);
-    try {
-      await _repository.login(identifier: identifier, password: password);
-      await _ref.read(authStatusProvider.notifier).setStatus(AuthStatus.authenticated);
-      _ref.read(appRouterProvider).go(MainScreen.routePath);
-      state = const AuthState();
-    } catch (error) {
-      state = state.copyWith(isLoading: false, errorMessage: _mapError(error));
+    final result = await _repository.login(identifier: identifier, password: password);
+    final errorMessage = _errorFromResult(result);
+    if (errorMessage != null) {
+      state = state.copyWith(isLoading: false, errorMessage: errorMessage);
+      return;
     }
+    await _ref.read(authStatusProvider.notifier).setStatus(AuthStatus.authenticated);
+    _ref.read(appRouterProvider).go(MainScreen.routePath);
+    state = const AuthState();
   }
 
   Future<void> browseAsGuest() async {
@@ -79,50 +80,52 @@ class AuthViewModel extends StateNotifier<AuthState> {
     required String password,
   }) async {
     state = const AuthState(isLoading: true);
-    try {
-      await _repository.register(name: name, email: email, password: password);
-      state = const AuthState();
-      _ref.read(appRouterProvider).go(
-        OtpScreen.routePath,
-        extra: OtpScreenArgs(flowType: OtpFlowType.register, identifier: email),
-      );
-    } catch (error) {
-      state = state.copyWith(isLoading: false, errorMessage: _mapError(error));
+    final result = await _repository.register(name: name, email: email, password: password);
+    final errorMessage = _errorFromResult(result);
+    if (errorMessage != null) {
+      state = state.copyWith(isLoading: false, errorMessage: errorMessage);
+      return;
     }
+    state = const AuthState();
+    _ref.read(appRouterProvider).go(
+      OtpScreen.routePath,
+      extra: OtpScreenArgs(flowType: OtpFlowType.register, identifier: email),
+    );
   }
 
   Future<void> requestPasswordReset(String identifier) async {
     state = const AuthState(isLoading: true);
-    try {
-      await _repository.requestPasswordReset(identifier);
-      state = const AuthState();
-      _ref.read(appRouterProvider).go(
-        OtpScreen.routePath,
-        extra:
-            OtpScreenArgs(flowType: OtpFlowType.forgotPassword, identifier: identifier),
-      );
-    } catch (error) {
-      state = state.copyWith(isLoading: false, errorMessage: _mapError(error));
+    final result = await _repository.requestPasswordReset(identifier);
+    final errorMessage = _errorFromResult(result);
+    if (errorMessage != null) {
+      state = state.copyWith(isLoading: false, errorMessage: errorMessage);
+      return;
     }
+    state = const AuthState();
+    _ref.read(appRouterProvider).go(
+      OtpScreen.routePath,
+      extra: OtpScreenArgs(flowType: OtpFlowType.forgotPassword, identifier: identifier),
+    );
   }
 
   Future<void> verifyOtp(String code, OtpScreenArgs args) async {
     state = const AuthState(isLoading: true);
-    try {
-      await _repository.verifyOtp(code);
-      state = const AuthState();
-      final router = _ref.read(appRouterProvider);
-      if (args.flowType == OtpFlowType.register) {
-        await _ref.read(authStatusProvider.notifier).setStatus(AuthStatus.authenticated);
-        router.go(MainScreen.routePath);
-      } else {
-        router.go(
-          ResetPasswordScreen.routePath,
-          extra: ResetPasswordArgs(identifier: args.identifier),
-        );
-      }
-    } catch (error) {
-      state = state.copyWith(isLoading: false, errorMessage: _mapError(error));
+    final result = await _repository.verifyOtp(code);
+    final errorMessage = _errorFromResult(result);
+    if (errorMessage != null) {
+      state = state.copyWith(isLoading: false, errorMessage: errorMessage);
+      return;
+    }
+    state = const AuthState();
+    final router = _ref.read(appRouterProvider);
+    if (args.flowType == OtpFlowType.register) {
+      await _ref.read(authStatusProvider.notifier).setStatus(AuthStatus.authenticated);
+      router.go(MainScreen.routePath);
+    } else {
+      router.go(
+        ResetPasswordScreen.routePath,
+        extra: ResetPasswordArgs(identifier: args.identifier),
+      );
     }
   }
 
@@ -131,40 +134,65 @@ class AuthViewModel extends StateNotifier<AuthState> {
     required String password,
   }) async {
     state = const AuthState(isLoading: true);
-    try {
-      await _repository.resetPassword(identifier: identifier, password: password);
-      await _ref.read(authStatusProvider.notifier).setStatus(AuthStatus.loggedOut);
-      state = const AuthState();
-      _ref.read(appRouterProvider).go(LoginScreen.routePath);
-    } catch (error) {
-      state = state.copyWith(isLoading: false, errorMessage: _mapError(error));
+    final result = await _repository.resetPassword(identifier: identifier, password: password);
+    final errorMessage = _errorFromResult(result);
+    if (errorMessage != null) {
+      state = state.copyWith(isLoading: false, errorMessage: errorMessage);
+      return;
     }
-  }
-
-  Future<void> logout() async {
-    await _repository.clearAuth();
     await _ref.read(authStatusProvider.notifier).setStatus(AuthStatus.loggedOut);
+    state = const AuthState();
     _ref.read(appRouterProvider).go(LoginScreen.routePath);
   }
 
-  String _mapError(Object error) {
+  Future<void> logout() async {
+    state = const AuthState(isLoading: true);
+    final result = await _repository.logout();
+    final errorMessage = _errorFromResult(result);
+    if (errorMessage != null) {
+      state = state.copyWith(isLoading: false, errorMessage: errorMessage);
+      return;
+    }
+    await _ref.read(authStatusProvider.notifier).setStatus(AuthStatus.loggedOut);
+    _ref.read(appRouterProvider).go(LoginScreen.routePath);
+    state = const AuthState();
+  }
+
+  String? _errorFromResult<T>(ApiResult<T> result) {
+    if (result is ApiError<T>) {
+      return _mapFailure(result.failure);
+    }
+    return null;
+  }
+
+  String _mapFailure(ApiFailure failure) {
     final locale = _ref.read(localeProvider);
     final l10n = lookupAppLocalizations(locale);
-    if (error is FakeAuthException) {
-      switch (error.error) {
-        case FakeAuthError.invalidCredentials:
-          return l10n.errorInvalidCredentials;
-        case FakeAuthError.invalidRegistration:
-          return l10n.errorInvalidRegistration;
-        case FakeAuthError.identifierRequired:
-          return l10n.errorIdentifierRequired;
-        case FakeAuthError.invalidResetData:
-          return l10n.errorInvalidResetData;
-        case FakeAuthError.incorrectOtp:
-          return l10n.errorIncorrectOtp;
-      }
+    switch (failure.messageKey) {
+      case 'errorInvalidCredentials':
+        return l10n.errorInvalidCredentials;
+      case 'errorInvalidRegistration':
+        return l10n.errorInvalidRegistration;
+      case 'errorIdentifierRequired':
+        return l10n.errorIdentifierRequired;
+      case 'errorInvalidResetData':
+        return l10n.errorInvalidResetData;
+      case 'errorIncorrectOtp':
+        return l10n.errorIncorrectOtp;
+      case 'error_bad_request':
+        return l10n.error_bad_request;
+      case 'error_unauthorized':
+        return l10n.error_unauthorized;
+      case 'error_not_found':
+        return l10n.error_not_found;
+      case 'error_validation':
+        return l10n.error_validation;
+      case 'error_server':
+        return l10n.error_server;
+      case 'error_unknown':
+        return l10n.error_unknown;
+      default:
+        return l10n.errorGeneric;
     }
-    debugPrint('Auth error: $error');
-    return l10n.errorGeneric;
   }
 }
