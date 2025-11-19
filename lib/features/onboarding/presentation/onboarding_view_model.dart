@@ -48,9 +48,9 @@ class OnboardingPageConfig {
         data = null,
         background = const Color(0xFFEFF6FB);
 
-  const OnboardingPageConfig.content(this.data)
+  OnboardingPageConfig.content(this.data)
       : type = OnboardingPageType.content,
-        background = data.background;
+        background = data!.background;
 
   final OnboardingPageType type;
   final OnboardingPageData? data;
@@ -101,7 +101,7 @@ class OnboardingViewModel extends StateNotifier<OnboardingState> {
   final Ref _ref;
   final OnboardingRepository _repository;
 
-  List<OnboardingPageData> get pages => onboardingPages;
+  List<OnboardingPageConfig> get pages => onboardingPages;
 
   void setPage(int index) {
     state = state.copyWith(pageIndex: index);
