@@ -28,7 +28,7 @@ class _HomeTabScreenState extends ConsumerState<HomeTabScreen> {
     super.initState();
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setZoomEnabled(false)
+      // ..setZoomEnabled(false)
       ..setBackgroundColor(Colors.transparent)
       ..setNavigationDelegate(
         NavigationDelegate(
