@@ -63,6 +63,8 @@
   "moreThemeSubtitle": "Choose how the app looks.",
   "moreLogout": "Logout",
   "moreLogoutSubtitle": "Sign out from this device.",
+  "morePermissions": "Permissions",
+  "morePermissionsSubtitle": "Manage notification, storage, and camera access.",
   "languageSelectorTitle": "Choose language",
   "languageEnglish": "English",
   "languageArabic": "العربية",
@@ -152,5 +154,50 @@
   "errorIdentifierRequired": "Identifier is required.",
   "errorInvalidResetData": "Invalid reset data.",
   "errorIncorrectOtp": "Incorrect OTP code.",
-  "errorGeneric": "Something went wrong. Please try again."
+  "errorGeneric": "Something went wrong. Please try again.",
+  "permissionsTitle": "Permissions",
+  "permissionsDescription": "Control what Liven can access on your device.",
+  "permissionNotificationsName": "Notifications",
+  "permissionStorageName": "Storage & Photos",
+  "permissionCameraName": "Camera",
+  "permissionNotificationsDialogTitle": "Stay informed",
+  "permissionNotificationsDialogDescription": "Allow notifications to get important reminders.",
+  "permissionStorageDialogTitle": "Save and share files",
+  "permissionStorageDialogDescription": "Grant storage access so we can read and save media on your device.",
+  "permissionCameraDialogTitle": "Share your video",
+  "permissionCameraDialogDescription": "Allow the camera to join Zoom meetings with live video.",
+  "permissionNotificationsStatusDescription": "Required for push and local alerts.",
+  "permissionStorageStatusDescription": "Needed to read and save photos or documents.",
+  "permissionCameraStatusDescription": "Needed for Zoom and other camera features.",
+  "permissionSettingsDialogTitle": "Enable from settings",
+  "permissionSettingsDialogDescription": "Open system settings and allow {permission} to continue.",
+  "@permissionSettingsDialogDescription": {
+    "placeholders": {
+      "permission": {
+        "type": "String"
+      }
+    }
+  },
+  "permissionDeniedDialogTitle": "Permission needed",
+  "permissionDeniedDialogDescription": "{permission} access is required to continue. Please allow the permission.",
+  "@permissionDeniedDialogDescription": {
+    "placeholders": {
+      "permission": {
+        "type": "String"
+      }
+    }
+  },
+  "permissionActionAllow": "Allow",
+  "permissionActionNotNow": "Not now",
+  "permissionActionRetry": "Try again",
+  "permissionActionGoToSettings": "Open Settings",
+  "permissionActionLater": "Later",
+  "permissionActionRequest": "Request",
+  "permissionStatusAllowed": "Allowed",
+  "permissionStatusDenied": "Denied",
+  "permissionStatusRestricted": "Restricted",
+  "permissionStatusLimited": "Limited",
+  "permissionStatusProvisional": "Provisional",
+  "permissionStatusPermanentlyDenied": "Permanently denied",
+  "permissionStatusUnknown": "Unknown"
 }

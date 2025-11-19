@@ -41,6 +41,12 @@
 <string>UIInterfaceOrientationLandscapeLeft</string>
 <string>UIInterfaceOrientationLandscapeRight</string>
 </array>
+<key>NSPhotoLibraryUsageDescription</key>
+<string>Photo access is needed to read and save files and media.</string>
+<key>NSPhotoLibraryAddUsageDescription</key>
+<string>We save files to your library when you export or share content.</string>
+<key>NSUserNotificationUsageDescription</key>
+<string>Notifications keep you updated about new activity.</string>
 <key>NSCameraUsageDescription</key>
 <string>Camera access is required to share video during Zoom meetings.</string>
 <key>NSMicrophoneUsageDescription</key>

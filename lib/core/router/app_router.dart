@@ -13,6 +13,7 @@ import '../../features/main/presentation/tabs/home_tab.dart';
 import '../../features/main/presentation/tabs/statistics_tab.dart';
 import '../../features/more/presentation/about_screen.dart';
 import '../../features/more/presentation/more_screen.dart';
+import '../../features/more/presentation/permissions_status_screen.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/profile/presentation/profile_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
@@ -152,6 +153,12 @@ GoRouter createRouter() {
         path: SettingsScreen.routePath,
         name: SettingsScreen.routeName,
         pageBuilder: (context, state) => _buildPage(state, const SettingsScreen()),
+      ),
+      GoRoute(
+        path: PermissionsStatusScreen.routePath,
+        name: PermissionsStatusScreen.routeName,
+        pageBuilder: (context, state) =>
+            _buildPage(state, const PermissionsStatusScreen()),
       ),
     ],
   );

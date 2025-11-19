@@ -17,6 +17,7 @@ class LocalStorageService {
   static const _authStatusKey = 'auth_status';
   static const _themeModeKey = 'theme_mode';
   static const _localeKey = 'locale';
+  static const _notificationPromptDismissedKey = 'notification_prompt_dismissed';
 
   Future<void> setOnboardingCompleted(bool value) async {
     await _prefs.setBool(_onboardingKey, value);
@@ -76,5 +77,13 @@ class LocalStorageService {
 
   Future<void> clearAuth() async {
     await _prefs.remove(_authStatusKey);
+  }
+
+  Future<void> setNotificationPromptDismissed(bool value) async {
+    await _prefs.setBool(_notificationPromptDismissedKey, value);
+  }
+
+  Future<bool> hasDismissedNotificationPrompt() async {
+    return _prefs.getBool(_notificationPromptDismissedKey) ?? false;
   }
 }
