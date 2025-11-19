@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:zoom_videosdk/zoom_videosdk.dart';
+import 'package:flutter_zoom_videosdk/flutter_zoom_videosdk.dart';
 
 import '../config/zoom_config.dart';
 
@@ -34,18 +34,41 @@ class ZoomService {
   final ZoomConfig _config;
   final ZoomVideoSdk _sdk;
   bool _initialized = false;
+  ZoomInitializationException? _initializationException;
+
+  bool get isInitialized => _initialized;
+  bool get hasInitializationError => _initializationException != null;
+  ZoomInitializationException? get initializationError => _initializationException;
 
   Future<void> ensureInitialized() async {
     if (_initialized) {
       return;
     }
 
-    await _sdk.initialize(
-      domain: _config.domain,
-      enableLog: _config.enableLogs,
-      logFilePrefix: _config.logFilePrefix,
-    );
-    _initialized = true;
+    if (_initializationException != null) {
+      throw _initializationException!;
+    }
+
+    try {
+      await _sdk.initialize(
+        domain: _config.domain,
+        enableLog: _config.enableLogs,
+        logFilePrefix: _config.logFilePrefix,
+      );
+      _initialized = true;
+    } on PlatformException catch (error, stackTrace) {
+      _initializationException = ZoomInitializationException(
+        error.message ?? 'Failed to initialize Zoom SDK',
+        stackTrace,
+      );
+      throw _initializationException!;
+    } catch (error, stackTrace) {
+      _initializationException = ZoomInitializationException(
+        error.toString(),
+        stackTrace,
+      );
+      throw _initializationException!;
+    }
   }
 
   Future<void> joinMeeting(ZoomMeetingPreset meeting) async {
@@ -110,4 +133,14 @@ class ZoomJoinException implements Exception {
 
   @override
   String toString() => 'ZoomJoinException: $message';
+}
+
+class ZoomInitializationException implements Exception {
+  const ZoomInitializationException(this.message, this.stackTrace);
+
+  final String message;
+  final StackTrace stackTrace;
+
+  @override
+  String toString() => 'ZoomInitializationException: $message';
 }

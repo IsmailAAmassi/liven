@@ -20,6 +20,7 @@
   "homeZoomJoinButton": "الانضمام إلى جلسة Zoom",
   "homeZoomMissingConfig": "يرجى تزويد التطبيق باسم الجلسة والرمز واسم المستخدم عبر ‎--dart-define‎ قبل الانضمام.",
   "homeZoomError": "تعذر فتح Zoom الآن. تحقق من الإعدادات وحاول مجددًا.",
+  "homeZoomInitError": "خدمة Zoom غير متاحة على هذا الجهاز حاليًا. جرّب مرة أخرى على إصدار مدعوم.",
   "homeFeedTitle": "آخر التحديثات",
   "homeFeedPlaceholderTitle": "تحديث تجريبي",
   "homeFeedPlaceholderSubtitle": "سيتم إضافة المحتوى عند ربط التطبيق بالخادم.",

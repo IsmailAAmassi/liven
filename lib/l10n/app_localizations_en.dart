@@ -50,6 +50,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeZoomError =>
       'Unable to open Zoom right now. Double-check your configuration and try again.';
   @override
+  String get homeZoomInitError =>
+      "Zoom calling isn't supported on this device yet. Please try again on a supported build.";
+  @override
   String get homeFeedTitle => 'Latest updates';
   @override
   String get homeFeedPlaceholderTitle => 'Placeholder update';
