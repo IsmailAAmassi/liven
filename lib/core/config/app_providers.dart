@@ -3,10 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:permission_handler/permission_handler.dart';
 
+import '../network/api_client.dart';
 import '../permissions/app_permission.dart';
 import '../permissions/permission_controller.dart';
 import '../permissions/permission_status_notifier.dart';
-import '../services/fake_auth_service.dart';
+import '../services/auth_storage.dart';
 import '../services/local_storage_service.dart';
 import '../services/permission_service.dart';
 import 'app_enums.dart';
@@ -15,8 +16,13 @@ final localStorageServiceProvider = Provider<LocalStorageService>((ref) {
   throw UnimplementedError('LocalStorageService not initialized');
 });
 
-final fakeAuthServiceProvider = Provider<FakeAuthService>((ref) {
-  return FakeAuthService();
+final authStorageProvider = Provider<AuthStorage>((ref) {
+  throw UnimplementedError('AuthStorage not initialized');
+});
+
+final apiClientProvider = Provider<ApiClient>((ref) {
+  final storage = ref.watch(authStorageProvider);
+  return ApiClient(storage: storage);
 });
 
 final permissionServiceProvider = Provider<PermissionService>((ref) {

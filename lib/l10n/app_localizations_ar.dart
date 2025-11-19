@@ -299,6 +299,18 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get errorGeneric => 'حدث خطأ ما، الرجاء المحاولة مرة أخرى.';
   @override
+  String get error_bad_request => 'طلب غير صالح، يرجى التحقق من البيانات والمحاولة مجددًا.';
+  @override
+  String get error_unauthorized => 'غير مصرح لك، يرجى تسجيل الدخول من جديد.';
+  @override
+  String get error_not_found => 'العنصر المطلوب غير موجود.';
+  @override
+  String get error_validation => 'يرجى مراجعة الحقول المطلوبة والمحاولة مرة أخرى.';
+  @override
+  String get error_server => 'خطأ في الخادم، حاول مرة أخرى لاحقًا.';
+  @override
+  String get error_unknown => 'حدث خطأ غير متوقع، يرجى المحاولة لاحقًا.';
+  @override
   String get permissionsTitle => 'الأذونات';
   @override
   String get permissionsDescription =>

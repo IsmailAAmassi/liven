@@ -300,6 +300,18 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errorGeneric => 'Something went wrong. Please try again.';
   @override
+  String get error_bad_request => 'Bad request. Please double-check your data and try again.';
+  @override
+  String get error_unauthorized => 'You are not authorized. Please login again.';
+  @override
+  String get error_not_found => 'Requested resource was not found.';
+  @override
+  String get error_validation => 'Please review the highlighted fields and try again.';
+  @override
+  String get error_server => 'Server error. Please try again later.';
+  @override
+  String get error_unknown => 'Unexpected error. Please try again.';
+  @override
   String get permissionsTitle => 'Permissions';
   @override
   String get permissionsDescription =>
