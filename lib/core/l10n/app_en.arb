@@ -1,0 +1,7 @@
+{
+  "@@locale": "en",
+  "appTitle": "Starter App",
+  "homeGreeting": "Hello",
+  "changeLanguage": "Change language",
+  "toggleTheme": "Toggle theme"
+}
