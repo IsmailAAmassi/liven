@@ -23,7 +23,7 @@ extension AppPermissionX on AppPermission {
   String dialogTitle(AppLocalizations l10n) {
     switch (this) {
       case AppPermission.notifications:
-        return l10n.permissionNotificationsDialogTitle;
+        return l10n.notificationsPermissionTitle;
       case AppPermission.storage:
         return l10n.permissionStorageDialogTitle;
       case AppPermission.camera:
@@ -34,7 +34,7 @@ extension AppPermissionX on AppPermission {
   String dialogDescription(AppLocalizations l10n) {
     switch (this) {
       case AppPermission.notifications:
-        return l10n.permissionNotificationsDialogDescription;
+        return l10n.notificationsPermissionDescription;
       case AppPermission.storage:
         return l10n.permissionStorageDialogDescription;
       case AppPermission.camera:

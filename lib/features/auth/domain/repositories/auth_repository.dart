@@ -7,12 +7,14 @@ abstract interface class AuthRepository {
   Future<AuthResult> login({
     required String identifier,
     required String password,
+    String? fcmToken,
   });
 
   Future<AuthResult> register({
     required String name,
     required String email,
     required String password,
+    String? fcmToken,
   });
 
   Future<EmptyResult> requestPasswordReset(String identifier);

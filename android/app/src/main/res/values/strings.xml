@@ -1,0 +1,4 @@
+<resources>
+    <string name="default_notification_channel_id">liven_default_channel</string>
+    <string name="default_notification_channel_name">Liven Notifications</string>
+</resources>

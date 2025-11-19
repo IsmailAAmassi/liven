@@ -20,6 +20,9 @@ dependencies:
   flutter_zoom_videosdk: ^2.3.0
   permission_handler: ^11.3.1
   webview_flutter: ^4.7.0
+  firebase_core: ^2.27.0
+  firebase_messaging: ^14.7.10
+  flutter_local_notifications: ^17.2.1
 
 dev_dependencies:
   flutter_test:
