@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/router/app_router.dart';
+import '../../../../core/services/zoom_service.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_text.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -16,6 +17,9 @@ class HomeTabScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+
+    final zoomState = ref.watch(zoomMeetingControllerProvider);
+    final zoomPreset = ref.watch(zoomMeetingPresetProvider);
 
     return ListView(
       padding: const EdgeInsets.all(24),
@@ -50,6 +54,56 @@ class HomeTabScreen extends ConsumerWidget {
                   label: l10n.homeOpenSettings,
                   onPressed: () =>
                       ref.read(appRouterProvider).go(SettingsScreen.routePath),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 32),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.homeZoomCardTitle,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  l10n.homeZoomCardDescription,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                if (!zoomPreset.isConfigured) ...[
+                  const SizedBox(height: 12),
+                  Text(
+                    l10n.homeZoomMissingConfig,
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.copyWith(color: Theme.of(context).colorScheme.error),
+                  ),
+                ],
+                if (zoomState.hasError) ...[
+                  const SizedBox(height: 12),
+                  Text(
+                    l10n.homeZoomError,
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.copyWith(color: Theme.of(context).colorScheme.error),
+                  ),
+                ],
+                const SizedBox(height: 16),
+                AppButton(
+                  label: l10n.homeZoomJoinButton,
+                  isLoading: zoomState.isLoading,
+                  onPressed: zoomPreset.isConfigured
+                      ? () => ref
+                          .read(zoomMeetingControllerProvider.notifier)
+                          .joinPresetMeeting()
+                      : null,
                 ),
               ],
             ),
