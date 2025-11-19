@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../services/local_storage_service.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+import '../permissions/app_permission.dart';
+import '../permissions/permission_controller.dart';
+import '../permissions/permission_status_notifier.dart';
 import '../services/fake_auth_service.dart';
+import '../services/local_storage_service.dart';
+import '../services/permission_service.dart';
 import 'app_enums.dart';
 
 final localStorageServiceProvider = Provider<LocalStorageService>((ref) {
@@ -11,6 +17,23 @@ final localStorageServiceProvider = Provider<LocalStorageService>((ref) {
 
 final fakeAuthServiceProvider = Provider<FakeAuthService>((ref) {
   return FakeAuthService();
+});
+
+final permissionServiceProvider = Provider<PermissionService>((ref) {
+  final storage = ref.watch(localStorageServiceProvider);
+  return PermissionService(storage: storage);
+});
+
+final permissionControllerProvider = Provider<PermissionController>((ref) {
+  final service = ref.watch(permissionServiceProvider);
+  return PermissionController(service: service);
+});
+
+final permissionStatusesProvider = StateNotifierProvider<
+    PermissionStatusesNotifier,
+    AsyncValue<Map<AppPermission, PermissionStatus>>>((ref) {
+  final service = ref.watch(permissionServiceProvider);
+  return PermissionStatusesNotifier(service);
 });
 
 final themeModeProvider = StateNotifierProvider<ThemeModeNotifier, ThemeMode>((ref) {

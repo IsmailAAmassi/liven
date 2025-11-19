@@ -63,6 +63,8 @@
   "moreThemeSubtitle": "اختر طريقة عرض التطبيق.",
   "moreLogout": "تسجيل الخروج",
   "moreLogoutSubtitle": "تسجيل الخروج من هذا الجهاز.",
+  "morePermissions": "الأذونات",
+  "morePermissionsSubtitle": "إدارة الوصول للإشعارات والتخزين والكاميرا.",
   "languageSelectorTitle": "اختر اللغة",
   "languageEnglish": "الإنجليزية",
   "languageArabic": "العربية",
@@ -152,5 +154,50 @@
   "errorIdentifierRequired": "المعرف مطلوب.",
   "errorInvalidResetData": "بيانات إعادة التعيين غير صحيحة.",
   "errorIncorrectOtp": "رمز التحقق غير صحيح.",
-  "errorGeneric": "حدث خطأ ما، الرجاء المحاولة مرة أخرى."
+  "errorGeneric": "حدث خطأ ما، الرجاء المحاولة مرة أخرى.",
+  "permissionsTitle": "الأذونات",
+  "permissionsDescription": "تحكم فيما يمكن لـ Liven الوصول إليه على جهازك.",
+  "permissionNotificationsName": "الإشعارات",
+  "permissionStorageName": "التخزين والصور",
+  "permissionCameraName": "الكاميرا",
+  "permissionNotificationsDialogTitle": "ابقَ على اطلاع",
+  "permissionNotificationsDialogDescription": "اسمح بالإشعارات لتصلك التحديثات المهمة.",
+  "permissionStorageDialogTitle": "حفظ ومشاركة الملفات",
+  "permissionStorageDialogDescription": "اسمح بالوصول للتخزين حتى نتمكن من قراءة الوسائط وحفظها على جهازك.",
+  "permissionCameraDialogTitle": "شارك صورتك",
+  "permissionCameraDialogDescription": "اسمح للكاميرا بالعمل أثناء اجتماعات Zoom بالفيديو.",
+  "permissionNotificationsStatusDescription": "مطلوبة للتنبيهات الفورية والمحلية.",
+  "permissionStorageStatusDescription": "ضرورية لقراءة الصور والملفات وحفظها.",
+  "permissionCameraStatusDescription": "ضرورية لاستخدام Zoom وميزات الكاميرا الأخرى.",
+  "permissionSettingsDialogTitle": "التفعيل من الإعدادات",
+  "permissionSettingsDialogDescription": "افتح إعدادات النظام واسمح لـ {permission} للمتابعة.",
+  "@permissionSettingsDialogDescription": {
+    "placeholders": {
+      "permission": {
+        "type": "String"
+      }
+    }
+  },
+  "permissionDeniedDialogTitle": "نحتاج الإذن",
+  "permissionDeniedDialogDescription": "الوصول إلى {permission} ضروري للمتابعة. الرجاء السماح به.",
+  "@permissionDeniedDialogDescription": {
+    "placeholders": {
+      "permission": {
+        "type": "String"
+      }
+    }
+  },
+  "permissionActionAllow": "سماح",
+  "permissionActionNotNow": "ليس الآن",
+  "permissionActionRetry": "حاول مرة أخرى",
+  "permissionActionGoToSettings": "افتح الإعدادات",
+  "permissionActionLater": "لاحقًا",
+  "permissionActionRequest": "طلب الإذن",
+  "permissionStatusAllowed": "مسموح",
+  "permissionStatusDenied": "مرفوض",
+  "permissionStatusRestricted": "مقيّد",
+  "permissionStatusLimited": "محدود",
+  "permissionStatusProvisional": "مؤقت",
+  "permissionStatusPermanentlyDenied": "مرفوض بشكل دائم",
+  "permissionStatusUnknown": "غير معروف"
 }

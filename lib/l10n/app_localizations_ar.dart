@@ -125,6 +125,11 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get moreLogoutSubtitle => 'تسجيل الخروج من هذا الجهاز.';
   @override
+  String get morePermissions => 'الأذونات';
+  @override
+  String get morePermissionsSubtitle =>
+      'إدارة الوصول للإشعارات والتخزين والكاميرا.';
+  @override
   String get languageSelectorTitle => 'اختر اللغة';
   @override
   String get languageEnglish => 'الإنجليزية';
@@ -293,4 +298,75 @@ class AppLocalizationsAr extends AppLocalizations {
   String get errorIncorrectOtp => 'رمز التحقق غير صحيح.';
   @override
   String get errorGeneric => 'حدث خطأ ما، الرجاء المحاولة مرة أخرى.';
+  @override
+  String get permissionsTitle => 'الأذونات';
+  @override
+  String get permissionsDescription =>
+      'تحكم فيما يمكن لـ Liven الوصول إليه على جهازك.';
+  @override
+  String get permissionNotificationsName => 'الإشعارات';
+  @override
+  String get permissionStorageName => 'التخزين والصور';
+  @override
+  String get permissionCameraName => 'الكاميرا';
+  @override
+  String get permissionNotificationsDialogTitle => 'ابقَ على اطلاع';
+  @override
+  String get permissionNotificationsDialogDescription =>
+      'اسمح بالإشعارات لتصلك التحديثات المهمة.';
+  @override
+  String get permissionStorageDialogTitle => 'حفظ ومشاركة الملفات';
+  @override
+  String get permissionStorageDialogDescription =>
+      'اسمح بالوصول للتخزين حتى نتمكن من قراءة الوسائط وحفظها على جهازك.';
+  @override
+  String get permissionCameraDialogTitle => 'شارك صورتك';
+  @override
+  String get permissionCameraDialogDescription =>
+      'اسمح للكاميرا بالعمل أثناء اجتماعات Zoom بالفيديو.';
+  @override
+  String get permissionNotificationsStatusDescription =>
+      'مطلوبة للتنبيهات الفورية والمحلية.';
+  @override
+  String get permissionStorageStatusDescription =>
+      'ضرورية لقراءة الصور والملفات وحفظها.';
+  @override
+  String get permissionCameraStatusDescription =>
+      'ضرورية لاستخدام Zoom وميزات الكاميرا الأخرى.';
+  @override
+  String get permissionSettingsDialogTitle => 'التفعيل من الإعدادات';
+  @override
+  String permissionSettingsDialogDescription(String permission) =>
+      'افتح إعدادات النظام واسمح لـ $permission للمتابعة.';
+  @override
+  String get permissionDeniedDialogTitle => 'نحتاج الإذن';
+  @override
+  String permissionDeniedDialogDescription(String permission) =>
+      'الوصول إلى $permission ضروري للمتابعة. الرجاء السماح به.';
+  @override
+  String get permissionActionAllow => 'سماح';
+  @override
+  String get permissionActionNotNow => 'ليس الآن';
+  @override
+  String get permissionActionRetry => 'حاول مرة أخرى';
+  @override
+  String get permissionActionGoToSettings => 'افتح الإعدادات';
+  @override
+  String get permissionActionLater => 'لاحقًا';
+  @override
+  String get permissionActionRequest => 'طلب الإذن';
+  @override
+  String get permissionStatusAllowed => 'مسموح';
+  @override
+  String get permissionStatusDenied => 'مرفوض';
+  @override
+  String get permissionStatusRestricted => 'مقيّد';
+  @override
+  String get permissionStatusLimited => 'محدود';
+  @override
+  String get permissionStatusProvisional => 'مؤقت';
+  @override
+  String get permissionStatusPermanentlyDenied => 'مرفوض بشكل دائم';
+  @override
+  String get permissionStatusUnknown => 'غير معروف';
 }

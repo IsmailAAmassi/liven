@@ -29,6 +29,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   Future<void> _prepare() async {
     final authNotifier = ref.read(authStatusProvider.notifier);
     final onboardingNotifier = ref.read(onboardingCompletedProvider.notifier);
+    final permissionController = ref.read(permissionControllerProvider);
 
     while (!authNotifier.isInitialized || !onboardingNotifier.isInitialized) {
       await Future.delayed(const Duration(milliseconds: 150));
@@ -37,6 +38,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     await Future.delayed(const Duration(milliseconds: 600));
 
     if (!mounted) return;
+
+    await permissionController.requestNotificationOnLaunch(context);
 
     final router = ref.read(appRouterProvider);
     final onboardingCompleted = ref.read(onboardingCompletedProvider);

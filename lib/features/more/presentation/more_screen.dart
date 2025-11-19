@@ -13,6 +13,7 @@ import '../../settings/presentation/widgets/language_selector_sheet.dart';
 import '../../settings/presentation/widgets/theme_selector_sheet.dart';
 import '../../terms/presentation/terms_of_use_screen.dart';
 import 'about_screen.dart';
+import 'permissions_status_screen.dart';
 
 class MoreScreen extends ConsumerWidget {
   const MoreScreen({super.key});
@@ -45,6 +46,13 @@ class MoreScreen extends ConsumerWidget {
           subtitle: Text(l10n.moreTermsSubtitle),
           trailing: const Icon(Icons.chevron_right),
           onTap: () => router.push(TermsOfUseScreen.routePath),
+        ),
+        ListTile(
+          leading: const Icon(Icons.verified_user_outlined),
+          title: Text(l10n.morePermissions),
+          subtitle: Text(l10n.morePermissionsSubtitle),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => router.push(PermissionsStatusScreen.routePath),
         ),
         ListTile(
           leading: const Icon(Icons.person_outline),

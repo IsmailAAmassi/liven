@@ -87,6 +87,8 @@ abstract class AppLocalizations {
   String get moreThemeSubtitle;
   String get moreLogout;
   String get moreLogoutSubtitle;
+  String get morePermissions;
+  String get morePermissionsSubtitle;
   String get languageSelectorTitle;
   String get languageEnglish;
   String get languageArabic;
@@ -163,6 +165,37 @@ abstract class AppLocalizations {
   String get errorInvalidResetData;
   String get errorIncorrectOtp;
   String get errorGeneric;
+  String get permissionsTitle;
+  String get permissionsDescription;
+  String get permissionNotificationsName;
+  String get permissionStorageName;
+  String get permissionCameraName;
+  String get permissionNotificationsDialogTitle;
+  String get permissionNotificationsDialogDescription;
+  String get permissionStorageDialogTitle;
+  String get permissionStorageDialogDescription;
+  String get permissionCameraDialogTitle;
+  String get permissionCameraDialogDescription;
+  String get permissionNotificationsStatusDescription;
+  String get permissionStorageStatusDescription;
+  String get permissionCameraStatusDescription;
+  String get permissionSettingsDialogTitle;
+  String permissionSettingsDialogDescription(String permission);
+  String get permissionDeniedDialogTitle;
+  String permissionDeniedDialogDescription(String permission);
+  String get permissionActionAllow;
+  String get permissionActionNotNow;
+  String get permissionActionRetry;
+  String get permissionActionGoToSettings;
+  String get permissionActionLater;
+  String get permissionActionRequest;
+  String get permissionStatusAllowed;
+  String get permissionStatusDenied;
+  String get permissionStatusRestricted;
+  String get permissionStatusLimited;
+  String get permissionStatusProvisional;
+  String get permissionStatusPermanentlyDenied;
+  String get permissionStatusUnknown;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -128,6 +128,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get moreLogoutSubtitle => 'Sign out from this device.';
   @override
+  String get morePermissions => 'Permissions';
+  @override
+  String get morePermissionsSubtitle =>
+      'Manage notification, storage, and camera access.';
+  @override
   String get languageSelectorTitle => 'Choose language';
   @override
   String get languageEnglish => 'English';
@@ -294,4 +299,75 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorIncorrectOtp => 'Incorrect OTP code.';
   @override
   String get errorGeneric => 'Something went wrong. Please try again.';
+  @override
+  String get permissionsTitle => 'Permissions';
+  @override
+  String get permissionsDescription =>
+      'Control what Liven can access on your device.';
+  @override
+  String get permissionNotificationsName => 'Notifications';
+  @override
+  String get permissionStorageName => 'Storage & Photos';
+  @override
+  String get permissionCameraName => 'Camera';
+  @override
+  String get permissionNotificationsDialogTitle => 'Stay informed';
+  @override
+  String get permissionNotificationsDialogDescription =>
+      'Allow notifications to get important reminders.';
+  @override
+  String get permissionStorageDialogTitle => 'Save and share files';
+  @override
+  String get permissionStorageDialogDescription =>
+      'Grant storage access so we can read and save media on your device.';
+  @override
+  String get permissionCameraDialogTitle => 'Share your video';
+  @override
+  String get permissionCameraDialogDescription =>
+      'Allow the camera to join Zoom meetings with live video.';
+  @override
+  String get permissionNotificationsStatusDescription =>
+      'Required for push and local alerts.';
+  @override
+  String get permissionStorageStatusDescription =>
+      'Needed to read and save photos or documents.';
+  @override
+  String get permissionCameraStatusDescription =>
+      'Needed for Zoom and other camera features.';
+  @override
+  String get permissionSettingsDialogTitle => 'Enable from settings';
+  @override
+  String permissionSettingsDialogDescription(String permission) =>
+      'Open system settings and allow $permission to continue.';
+  @override
+  String get permissionDeniedDialogTitle => 'Permission needed';
+  @override
+  String permissionDeniedDialogDescription(String permission) =>
+      '$permission access is required to continue. Please allow the permission.';
+  @override
+  String get permissionActionAllow => 'Allow';
+  @override
+  String get permissionActionNotNow => 'Not now';
+  @override
+  String get permissionActionRetry => 'Try again';
+  @override
+  String get permissionActionGoToSettings => 'Open Settings';
+  @override
+  String get permissionActionLater => 'Later';
+  @override
+  String get permissionActionRequest => 'Request';
+  @override
+  String get permissionStatusAllowed => 'Allowed';
+  @override
+  String get permissionStatusDenied => 'Denied';
+  @override
+  String get permissionStatusRestricted => 'Restricted';
+  @override
+  String get permissionStatusLimited => 'Limited';
+  @override
+  String get permissionStatusProvisional => 'Provisional';
+  @override
+  String get permissionStatusPermanentlyDenied => 'Permanently denied';
+  @override
+  String get permissionStatusUnknown => 'Unknown';
 }

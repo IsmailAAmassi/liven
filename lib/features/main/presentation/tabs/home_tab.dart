@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/config/app_providers.dart';
+import '../../../../core/permissions/app_permission.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/services/zoom_service.dart';
 import '../../../../core/widgets/app_button.dart';
@@ -8,14 +10,49 @@ import '../../../../core/widgets/app_text.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../settings/presentation/settings_screen.dart';
 
-class HomeTabScreen extends ConsumerWidget {
+class HomeTabScreen extends ConsumerStatefulWidget {
   const HomeTabScreen({super.key});
 
   static const routePath = '/main/home';
   static const routeName = 'home';
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeTabScreen> createState() => _HomeTabScreenState();
+}
+
+class _HomeTabScreenState extends ConsumerState<HomeTabScreen> {
+  bool _hasRequestedStorage = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_hasRequestedStorage) {
+      _hasRequestedStorage = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _ensureStoragePermission();
+        }
+      });
+    }
+  }
+
+  Future<void> _ensureStoragePermission() async {
+    final controller = ref.read(permissionControllerProvider);
+    await controller.ensurePermission(context, AppPermission.storage);
+    await ref.read(permissionStatusesProvider.notifier).refresh();
+  }
+
+  Future<void> _handleJoinZoom() async {
+    final controller = ref.read(permissionControllerProvider);
+    final granted = await controller.ensurePermission(context, AppPermission.camera);
+    if (!granted) {
+      return;
+    }
+    await ref.read(zoomMeetingControllerProvider.notifier).joinPresetMeeting();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
     final zoomState = ref.watch(zoomMeetingControllerProvider);
@@ -101,11 +138,7 @@ class HomeTabScreen extends ConsumerWidget {
                 AppButton(
                   label: l10n.homeZoomJoinButton,
                   isLoading: zoomState.isLoading,
-                  onPressed: zoomPreset.isConfigured
-                      ? () => ref
-                          .read(zoomMeetingControllerProvider.notifier)
-                          .joinPresetMeeting()
-                      : null,
+                  onPressed: zoomPreset.isConfigured ? _handleJoinZoom : null,
                 ),
               ],
             ),
