@@ -41,6 +41,10 @@ abstract class AppLocalizations {
   String get navHome;
   String get navProfile;
   String get navMore;
+  String get webviewErrorTitle;
+  String get webviewErrorMessage;
+  String get webviewConfigError;
+  String get webviewRetryButton;
   String get homeWelcomeTitle;
   String get homeWelcomeSubtitle;
   String get homeCardTitle;

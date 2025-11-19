@@ -25,6 +25,16 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get navMore => 'More';
   @override
+  String get webviewErrorTitle => "Can't load content";
+  @override
+  String get webviewErrorMessage =>
+      "We couldn't load the Liven web experience. Check your connection and try again.";
+  @override
+  String get webviewConfigError =>
+      "We're missing the home web URL. Verify APP_HOME_WEB_URL in your environment.";
+  @override
+  String get webviewRetryButton => 'Try again';
+  @override
   String get homeWelcomeTitle => 'Hello there 👋';
   @override
   String get homeWelcomeSubtitle =>
