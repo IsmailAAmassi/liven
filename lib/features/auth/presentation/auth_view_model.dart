@@ -8,6 +8,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../main/presentation/main_screen.dart';
 import '../../profile/presentation/complete_profile_screen.dart';
 import '../domain/models/auth_session.dart';
+import '../domain/models/register_result.dart';
 import '../data/auth_repository.dart';
 import 'login_screen.dart';
 import 'otp_screen.dart';
@@ -90,12 +91,16 @@ class AuthViewModel extends StateNotifier<AuthState> {
 
   Future<void> register({
     required String name,
-    required String email,
+    required String phone,
     required String password,
   }) async {
     state = const AuthState(isLoading: true);
-    final result = await _repository.register(name: name, email: email, password: password);
-    final errorMessage = _errorFromResult(result);
+    final result = await _repository.register(
+      phone: phone,
+      password: password,
+      name: name,
+    );
+    final errorMessage = _registerError(result);
     if (errorMessage != null) {
       state = state.copyWith(isLoading: false, errorMessage: errorMessage);
       return;
@@ -103,7 +108,7 @@ class AuthViewModel extends StateNotifier<AuthState> {
     state = const AuthState();
     _ref.read(appRouterProvider).go(
       OtpScreen.routePath,
-      extra: OtpScreenArgs(flowType: OtpFlowType.register, identifier: email),
+      extra: OtpScreenArgs(flowType: OtpFlowType.register, identifier: phone),
     );
   }
 
@@ -187,6 +192,8 @@ class AuthViewModel extends StateNotifier<AuthState> {
         return failure.details?['message'] as String? ?? l10n.authInvalidCredentials;
       case 'auth_login_failed':
         return l10n.authLoginFailed;
+      case 'auth_register_failed':
+        return l10n.authRegisterFailed;
       case 'errorInvalidRegistration':
         return l10n.errorInvalidRegistration;
       case 'errorIdentifierRequired':
@@ -212,5 +219,35 @@ class AuthViewModel extends StateNotifier<AuthState> {
       default:
         return l10n.errorGeneric;
     }
+  }
+
+  String? _registerError(RegisterResult result) {
+    if (result.success) return null;
+    final locale = _ref.read(localeProvider);
+    final l10n = lookupAppLocalizations(locale);
+    if (result.hasErrors) {
+      final mappedErrors = result.errors!
+          .map((error) => _mapRegisterValidationError(error, l10n))
+          .toList();
+      return mappedErrors.join('\n');
+    }
+    if (result.messageKey != null) {
+      return _mapFailure(ApiFailure(messageKey: result.messageKey));
+    }
+    if (result.message != null && result.message!.isNotEmpty) {
+      return result.message;
+    }
+    return l10n.authRegisterFailed;
+  }
+
+  String _mapRegisterValidationError(String error, AppLocalizations l10n) {
+    final normalized = error.toLowerCase();
+    if (normalized.contains('phone has already been taken')) {
+      return l10n.authErrorPhoneTaken;
+    }
+    if (normalized.contains('password') && normalized.contains('6')) {
+      return l10n.authErrorPasswordTooShort;
+    }
+    return error;
   }
 }

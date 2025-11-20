@@ -24,7 +24,7 @@ class RegisterScreen extends ConsumerStatefulWidget {
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
   late final TapGestureRecognizer _termsRecognizer;
@@ -38,7 +38,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   @override
   void dispose() {
     _nameController.dispose();
-    _emailController.dispose();
+    _phoneController.dispose();
     _passwordController.dispose();
     _confirmController.dispose();
     _termsRecognizer.dispose();
@@ -49,7 +49,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     if (_formKey.currentState?.validate() ?? false) {
       ref.read(authViewModelProvider.notifier).register(
             name: _nameController.text.trim(),
-            email: _emailController.text.trim(),
+            phone: _phoneController.text.trim(),
             password: _passwordController.text.trim(),
           );
     }
@@ -92,15 +92,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: 16),
                 AppTextField(
-                  label: l10n.fieldEmail,
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
+                  label: l10n.fieldPhone,
+                  controller: _phoneController,
+                  keyboardType: TextInputType.phone,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return l10n.validationRequiredField;
                     }
-                    if (!value.contains('@')) {
-                      return l10n.validationEmail;
+                    if (value.length < 9) {
+                      return l10n.validationPhone;
                     }
                     return null;
                   },

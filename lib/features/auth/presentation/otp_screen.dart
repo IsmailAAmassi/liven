@@ -56,6 +56,11 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                       : l10n.otpResetMessage(widget.args.identifier),
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
+                const SizedBox(height: 8),
+                AppText(
+                  l10n.otpEnterCodeMessage,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
                 const SizedBox(height: 24),
                 OtpCodeInput(
                   onChanged: (value) => setState(() => _code = value),
