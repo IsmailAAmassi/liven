@@ -44,6 +44,7 @@ abstract class AppLocalizations {
   String get webviewErrorTitle;
   String get webviewErrorMessage;
   String get webviewConfigError;
+  String get webviewSettingsError;
   String get webviewRetryButton;
   String get homeWelcomeTitle;
   String get homeWelcomeSubtitle;

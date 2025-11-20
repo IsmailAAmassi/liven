@@ -33,6 +33,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get webviewConfigError =>
       "We're missing the home web URL. Verify APP_HOME_WEB_URL in your environment.";
   @override
+  String get webviewSettingsError =>
+      "We couldn't load the page URL from settings. Refresh and try again.";
+  @override
   String get webviewRetryButton => 'Try again';
   @override
   String get homeWelcomeTitle => 'Hello there 👋';
