@@ -6,6 +6,8 @@ import '../../../core/network/api_result.dart';
 import '../../../core/router/app_router.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../main/presentation/main_screen.dart';
+import '../../profile/presentation/complete_profile_screen.dart';
+import '../domain/models/auth_session.dart';
 import '../data/auth_repository.dart';
 import 'login_screen.dart';
 import 'otp_screen.dart';
@@ -54,16 +56,29 @@ class AuthViewModel extends StateNotifier<AuthState> {
   final Ref _ref;
   final AuthRepository _repository;
 
-  Future<void> login({required String identifier, required String password}) async {
+  Future<void> login({
+    required String phone,
+    required String password,
+    String? fcmToken,
+  }) async {
     state = const AuthState(isLoading: true);
-    final result = await _repository.login(identifier: identifier, password: password);
+    final result = await _repository.login(
+      phone: phone,
+      password: password,
+      fcmToken: fcmToken,
+    );
     final errorMessage = _errorFromResult(result);
     if (errorMessage != null) {
       state = state.copyWith(isLoading: false, errorMessage: errorMessage);
       return;
     }
+    final session = (result as ApiSuccess<AuthSession>).data;
     await _ref.read(authStatusProvider.notifier).setStatus(AuthStatus.authenticated);
-    _ref.read(appRouterProvider).go(MainScreen.routePath);
+    if (session.profileCompleted) {
+      _ref.read(appRouterProvider).go(MainScreen.routePath);
+    } else {
+      _ref.read(appRouterProvider).go(CompleteProfileScreen.routePath);
+    }
     state = const AuthState();
   }
 
@@ -168,8 +183,10 @@ class AuthViewModel extends StateNotifier<AuthState> {
     final locale = _ref.read(localeProvider);
     final l10n = lookupAppLocalizations(locale);
     switch (failure.messageKey) {
-      case 'errorInvalidCredentials':
-        return l10n.errorInvalidCredentials;
+      case 'auth_invalid_credentials':
+        return failure.details?['message'] as String? ?? l10n.authInvalidCredentials;
+      case 'auth_login_failed':
+        return l10n.authLoginFailed;
       case 'errorInvalidRegistration':
         return l10n.errorInvalidRegistration;
       case 'errorIdentifierRequired':
@@ -178,6 +195,8 @@ class AuthViewModel extends StateNotifier<AuthState> {
         return l10n.errorInvalidResetData;
       case 'errorIncorrectOtp':
         return l10n.errorIncorrectOtp;
+      case 'error_network':
+        return l10n.errorNetwork;
       case 'error_bad_request':
         return l10n.error_bad_request;
       case 'error_unauthorized':

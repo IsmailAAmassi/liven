@@ -17,6 +17,7 @@ import '../../features/more/presentation/more_screen.dart';
 import '../../features/more/presentation/permissions_status_screen.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/profile/presentation/profile_screen.dart';
+import '../../features/profile/presentation/complete_profile_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
 import '../../features/splash/presentation/splash_screen.dart';
 import '../../features/terms/presentation/terms_of_use_screen.dart';
@@ -70,6 +71,12 @@ GoRouter createRouter() {
           }
           return _buildPage(state, OtpScreen(args: args));
         },
+      ),
+      GoRoute(
+        path: CompleteProfileScreen.routePath,
+        name: CompleteProfileScreen.routeName,
+        pageBuilder: (context, state) =>
+            _buildPage(state, const CompleteProfileScreen()),
       ),
       GoRoute(
         path: ResetPasswordScreen.routePath,

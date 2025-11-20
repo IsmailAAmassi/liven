@@ -3,6 +3,7 @@ import '../../../../core/services/auth_storage.dart';
 import '../../../../core/utils/unit.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/models/auth_result.dart';
+import '../../domain/models/auth_session.dart';
 import '../../domain/repositories/auth_repository.dart';
 
 class FakeAuthService implements AuthRepository {
@@ -14,16 +15,21 @@ class FakeAuthService implements AuthRepository {
 
   @override
   Future<AuthResult> login({
-    required String identifier,
+    required String phone,
     required String password,
+    String? fcmToken,
   }) async {
     await Future.delayed(const Duration(milliseconds: 600));
-    if (identifier.isEmpty || password.isEmpty) {
-      return const ApiError(ApiFailure(messageKey: 'errorInvalidCredentials'));
+    if (phone.isEmpty || password.isEmpty) {
+      return const ApiError(ApiFailure(messageKey: 'auth_invalid_credentials'));
     }
-    final user = _buildUser(identifier: identifier);
-    await _persistSession(user);
-    return ApiSuccess(user);
+    final session = AuthSession(
+      token: _token,
+      userId: 1,
+      profileCompleted: true,
+    );
+    await _persistSession(session);
+    return ApiSuccess(session);
   }
 
   @override
@@ -37,8 +43,13 @@ class FakeAuthService implements AuthRepository {
       return const ApiError(ApiFailure(messageKey: 'errorInvalidRegistration'));
     }
     final user = User(id: '2', name: name, email: email);
-    await _persistSession(user);
-    return ApiSuccess(user);
+    final session = AuthSession(
+      token: _token,
+      userId: 2,
+      profileCompleted: true,
+    );
+    await _persistUserSession(user, session);
+    return ApiSuccess(session);
   }
 
   @override
@@ -81,12 +92,17 @@ class FakeAuthService implements AuthRepository {
   @override
   Future<AuthResult> refreshToken() async {
     await Future.delayed(const Duration(milliseconds: 300));
-    final user = await _storage.getUser();
-    if (user == null) {
+    final id = await _storage.getUserId();
+    if (id == null) {
       return const ApiError(ApiFailure(messageKey: 'error_unauthorized'));
     }
-    await _storage.saveToken(_token);
-    return ApiSuccess(user);
+    final session = AuthSession(
+      token: _token,
+      userId: id,
+      profileCompleted: true,
+    );
+    await _storage.saveAuthToken(_token);
+    return ApiSuccess(session);
   }
 
   @override
@@ -99,17 +115,13 @@ class FakeAuthService implements AuthRepository {
     return _storage.clear();
   }
 
-  User _buildUser({required String identifier}) {
-    final email = identifier.contains('@') ? identifier : 'user@liven.app';
-    return User(
-      id: '1',
-      name: 'Demo User',
-      email: email,
-    );
+  Future<void> _persistSession(AuthSession session) async {
+    await _storage.saveAuthToken(session.token);
+    await _storage.saveUserId(session.userId);
   }
 
-  Future<void> _persistSession(User user) async {
-    await _storage.saveToken(_token);
+  Future<void> _persistUserSession(User user, AuthSession session) async {
+    await _persistSession(session);
     await _storage.saveUser(user);
   }
 }

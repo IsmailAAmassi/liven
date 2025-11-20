@@ -66,11 +66,11 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                 ),
                 const SizedBox(height: 24),
                 AppTextField(
-                  label: l10n.fieldEmailOrPhone,
+                  label: l10n.fieldPhone,
                   controller: _identifierController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return l10n.validationEmailOrPhone;
+                      return l10n.validationPhone;
                     }
                     return null;
                   },

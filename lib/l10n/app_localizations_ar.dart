@@ -196,7 +196,12 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get loginSubtitle => 'سجّل دخولك لمواصلة رحلتك.';
   @override
-  String get fieldEmailOrPhone => 'البريد أو الهاتف';
+  String get completeProfileTitle => 'أكمل ملفك الشخصي';
+  @override
+  String get completeProfilePlaceholder =>
+      'أضف بياناتك للمتابعة. قادم قريبًا.';
+  @override
+  String get fieldPhone => 'رقم الجوال';
   @override
   String get fieldPassword => 'كلمة المرور';
   @override
@@ -210,8 +215,7 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get validationRequiredField => 'هذا الحقل مطلوب.';
   @override
-  String get validationEmailOrPhone =>
-      'يرجى إدخال البريد الإلكتروني أو رقم الهاتف.';
+  String get validationPhone => 'يرجى إدخال رقم الجوال.';
   @override
   String get validationEmail => 'أدخل بريدًا إلكترونيًا صالحًا.';
   @override
@@ -302,8 +306,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get forgotPasswordDescription =>
       'أدخل المعرف المستخدم في حسابك للحصول على رمز إعادة التعيين.';
   @override
-  String get errorInvalidCredentials =>
-      'يرجى إدخال بيانات اعتماد صالحة.';
+  String get authLoginFailed => 'تعذر تسجيل الدخول، حاول مرة أخرى.';
+  @override
+  String get authInvalidCredentials => 'رقم الجوال أو كلمة المرور غير صحيحة.';
   @override
   String get errorInvalidRegistration =>
       'يرجى توفير بيانات تسجيل صحيحة.';
@@ -313,6 +318,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get errorInvalidResetData => 'بيانات إعادة التعيين غير صحيحة.';
   @override
   String get errorIncorrectOtp => 'رمز التحقق غير صحيح.';
+  @override
+  String get errorNetwork => 'خطأ في الشبكة، تحقق من الاتصال وحاول مجددًا.';
   @override
   String get settings_load_error =>
       'تعذر تحميل الإعدادات. يرجى المحاولة مرة أخرى.';

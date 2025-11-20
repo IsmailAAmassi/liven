@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:io';
+
 import '../../../../core/network/api_client.dart';
 import '../../../../core/network/api_error_mapper.dart';
 import '../../../../core/network/api_result.dart';
@@ -5,6 +8,7 @@ import '../../../../core/services/auth_storage.dart';
 import '../../../../core/utils/unit.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/models/auth_result.dart';
+import '../../domain/models/auth_session.dart';
 import '../../domain/repositories/auth_repository.dart';
 
 class RealAuthService implements AuthRepository {
@@ -22,16 +26,37 @@ class RealAuthService implements AuthRepository {
 
   @override
   Future<AuthResult> login({
-    required String identifier,
+    required String phone,
     required String password,
+    String? fcmToken,
   }) async {
-    final payload = _identifierPayload(identifier)
-      ..['password'] = password;
-    final response = await _apiClient.post(_loginPath, body: payload);
-    if (response.isSuccessful) {
-      return await _handleAuthSuccess(response.data);
+    try {
+      final response = await _apiClient.post(_loginPath, body: {
+        'phone': phone,
+        'password': password,
+        if (fcmToken != null) 'fcm_token': fcmToken,
+      });
+      if (response.isSuccessful) {
+        return await _handleLoginSuccess(response.data);
+      }
+      if (response.statusCode == 422) {
+        final message = _extractMessage(response.data);
+        return ApiError(
+          ApiFailure(
+            statusCode: response.statusCode,
+            messageKey: 'auth_invalid_credentials',
+            details: {'message': message},
+          ),
+        );
+      }
+      return ApiError(_errorMapper.map(response.statusCode, response.data));
+    } on SocketException catch (_) {
+      return const ApiError(ApiFailure(messageKey: 'error_network'));
+    } on TimeoutException catch (_) {
+      return const ApiError(ApiFailure(messageKey: 'error_network'));
+    } catch (_) {
+      return const ApiError(ApiFailure(messageKey: 'auth_login_failed'));
     }
-    return ApiError(_errorMapper.map(response.statusCode, response.data));
   }
 
   @override
@@ -107,14 +132,35 @@ class RealAuthService implements AuthRepository {
     return _storage.clear();
   }
 
+  Future<AuthResult> _handleLoginSuccess(dynamic data) async {
+    final payload = _parsePayload(data);
+    final token = payload['token']?.toString() ?? '';
+    final userId = _parseId(payload);
+    final profileCompleted = payload['profile_completed'] as bool? ?? true;
+    final session = AuthSession(
+      token: token,
+      userId: userId,
+      profileCompleted: profileCompleted,
+    );
+    await _storage.saveAuthToken(token);
+    await _storage.saveUserId(userId);
+    return ApiSuccess(session);
+  }
+
   Future<AuthResult> _handleAuthSuccess(dynamic data) async {
     final payload = _parsePayload(data);
-    final token = payload['token'] as String? ?? '';
+    final token = payload['token']?.toString() ?? '';
     final userJson = _parseUser(payload);
     final user = User.fromJson(userJson);
-    await _storage.saveToken(token);
+    final session = AuthSession(
+      token: token,
+      userId: _parseId(payload, fallbackUser: user),
+      profileCompleted: payload['profile_completed'] as bool? ?? true,
+    );
+    await _storage.saveAuthToken(token);
+    await _storage.saveUserId(session.userId);
     await _storage.saveUser(user);
-    return ApiSuccess(user);
+    return ApiSuccess(session);
   }
 
   Future<EmptyResult> _handleEmptyResult(ApiClientResponse response) async {
@@ -149,6 +195,24 @@ class RealAuthService implements AuthRepository {
       payload['phone'] = identifier;
     }
     return payload;
+  }
+
+  int _parseId(Map<String, dynamic> payload, {User? fallbackUser}) {
+    final rawId = payload['id'] ?? payload['user_id'] ?? fallbackUser?.id;
+    if (rawId is int) {
+      return rawId;
+    }
+    return int.tryParse(rawId?.toString() ?? '') ?? 0;
+  }
+
+  String _extractMessage(dynamic data) {
+    if (data is Map<String, dynamic>) {
+      final message = data['message'];
+      if (message is String && message.isNotEmpty) {
+        return message;
+      }
+    }
+    return '';
   }
 
   String get _loginPath => '/mobile/login';
