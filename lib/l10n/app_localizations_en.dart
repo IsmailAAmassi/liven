@@ -201,8 +201,46 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get completeProfileTitle => 'Complete your profile';
   @override
-  String get completeProfilePlaceholder =>
-      'Add your details to continue. Coming soon.';
+  String get completeProfileDescription =>
+      'Add your age, gender, height, and weight to continue.';
+  @override
+  String get completeProfilePlaceholder => 'Add your details to continue.';
+  @override
+  String get completeProfileRequiredNotice =>
+      'To continue, please complete your profile.';
+  @override
+  String get completeProfileSuccess => 'Profile completed successfully.';
+  @override
+  String get completeProfileError =>
+      "Couldn't complete profile. Please try again.";
+  @override
+  String get completeProfileSaveButton => 'Save';
+  @override
+  String get completeProfileSkipButton => 'Skip for now';
+  @override
+  String get ageLabel => 'Age';
+  @override
+  String get genderLabel => 'Gender';
+  @override
+  String get lengthLabel => 'Height (cm)';
+  @override
+  String get weightLabel => 'Weight (kg)';
+  @override
+  String get ageRequiredError => 'Age is required.';
+  @override
+  String get ageInvalidError => 'Enter a valid age between 10 and 100.';
+  @override
+  String get genderRequiredError => 'Gender is required.';
+  @override
+  String get lengthRequiredError => 'Height is required.';
+  @override
+  String get lengthInvalidError =>
+      'Enter a valid height between 100 and 250 cm.';
+  @override
+  String get weightRequiredError => 'Weight is required.';
+  @override
+  String get weightInvalidError =>
+      'Enter a valid weight between 20 and 300 kg.';
   @override
   String get fieldPhone => 'Phone number';
   @override

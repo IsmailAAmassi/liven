@@ -19,6 +19,15 @@ class AppConfig {
     const String.fromEnvironment('USE_FAKE_SETTINGS', defaultValue: 'false'),
   );
 
+  static final bool completeProfileRequired = _parseBool(
+    const String.fromEnvironment('COMPLETE_PROFILE_REQUIRED', defaultValue: 'false'),
+  );
+
+  static final int completeProfileReminderIntervalMinutes = _parseInt(
+    const String.fromEnvironment('COMPLETE_PROFILE_REMINDER_INTERVAL_MINUTES',
+        defaultValue: '1440'),
+  );
+
   static bool _parseBool(String value) {
     final normalized = value.toLowerCase().trim();
     if (normalized == 'true' || normalized == '1') {
@@ -28,5 +37,9 @@ class AppConfig {
       return false;
     }
     return true;
+  }
+
+  static int _parseInt(String value) {
+    return int.tryParse(value.trim()) ?? 0;
   }
 }

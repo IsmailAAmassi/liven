@@ -6,6 +6,7 @@ import '../../../core/network/api_result.dart';
 import '../../../core/router/app_router.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../main/presentation/main_screen.dart';
+import '../../profile/application/profile_completion_guard.dart';
 import '../../profile/presentation/complete_profile_screen.dart';
 import '../domain/models/auth_session.dart';
 import '../domain/models/forgot_password_result.dart';
@@ -85,11 +86,7 @@ class AuthViewModel extends StateNotifier<AuthState> {
     }
     final session = (result as ApiSuccess<AuthSession>).data;
     await _ref.read(authStatusProvider.notifier).setStatus(AuthStatus.authenticated);
-    if (session.profileCompleted) {
-      _ref.read(appRouterProvider).go(MainScreen.routePath);
-    } else {
-      _ref.read(appRouterProvider).go(CompleteProfileScreen.routePath);
-    }
+    await _navigateAfterAuth(session.profileCompleted);
     state = const AuthState();
   }
 
@@ -178,6 +175,20 @@ class AuthViewModel extends StateNotifier<AuthState> {
     await _ref.read(authStatusProvider.notifier).setStatus(AuthStatus.loggedOut);
     _ref.read(appRouterProvider).go(LoginScreen.routePath);
     state = const AuthState();
+  }
+
+  Future<void> _navigateAfterAuth(bool profileCompleted) async {
+    final guard = _ref.read(profileCompletionGuardProvider);
+    final router = _ref.read(appRouterProvider);
+    final shouldShow = await guard.shouldShowCompletion(
+      profileCompleted: profileCompleted,
+    );
+    if (shouldShow) {
+      await guard.markPrompted();
+      router.go(CompleteProfileScreen.routePath);
+    } else {
+      router.go(MainScreen.routePath);
+    }
   }
 
   String? _errorFromResult<T>(ApiResult<T> result) {
