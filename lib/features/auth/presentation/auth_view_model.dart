@@ -9,12 +9,12 @@ import '../../../l10n/app_localizations.dart';
 import '../../main/presentation/main_screen.dart';
 import '../../profile/application/profile_completion_guard.dart';
 import '../../profile/presentation/complete_profile_screen.dart';
+import '../application/logout_controller.dart';
 import '../domain/models/auth_session.dart';
 import '../domain/models/forgot_password_result.dart';
 import '../domain/models/register_result.dart';
 import '../domain/models/reset_password_result.dart';
 import '../data/auth_repository.dart';
-import 'login_screen.dart';
 import 'otp_screen.dart';
 import 'reset_password_screen.dart';
 
@@ -165,16 +165,12 @@ class AuthViewModel extends StateNotifier<AuthState> {
     state = AuthState(successMessage: result.message ?? _currentL10n.resetPasswordSuccessMessage);
   }
 
-  Future<void> logout() async {
+  Future<void> logout(BuildContext context) async {
     state = const AuthState(isLoading: true);
-    final result = await _repository.logout();
-    final errorMessage = _errorFromResult(result);
-    if (errorMessage != null) {
-      state = state.copyWith(isLoading: false, errorMessage: errorMessage);
-      return;
-    }
-    await _ref.read(authStatusProvider.notifier).setStatus(AuthStatus.loggedOut);
-    _ref.read(appRouterProvider).go(LoginScreen.routePath);
+    await _ref.read(logoutControllerProvider).logout(
+          context: context,
+          showMessage: true,
+        );
     state = const AuthState();
   }
 

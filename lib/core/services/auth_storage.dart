@@ -25,7 +25,11 @@ class AuthStorage {
   }
 
   Future<String?> getAuthToken() async {
-    return _prefs.getString(_tokenKey);
+    final token = _prefs.getString(_tokenKey);
+    if (token == null || token.isEmpty) {
+      return null;
+    }
+    return token;
   }
 
   Future<void> clearAuthToken() async {
@@ -90,6 +94,10 @@ class AuthStorage {
   }
 
   Future<void> clear() async {
+    await clearAuth();
+  }
+
+  Future<void> clearAuth() async {
     await Future.wait([
       clearAuthToken(),
       clearUser(),

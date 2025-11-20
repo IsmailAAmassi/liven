@@ -5,7 +5,7 @@ import '../../../core/config/app_enums.dart';
 import '../../../core/config/app_providers.dart';
 import '../../../core/router/app_router.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../auth/presentation/auth_view_model.dart';
+import '../../auth/application/logout_controller.dart';
 import '../../auth/presentation/widgets/logout_confirmation_dialog.dart';
 import '../../profile/presentation/profile_screen.dart';
 import '../../settings/presentation/settings_screen.dart';
@@ -27,6 +27,7 @@ class MoreScreen extends ConsumerWidget {
     final router = ref.read(appRouterProvider);
     final locale = ref.watch(localeProvider);
     final themeMode = ref.watch(themeModeProvider);
+    final logoutController = ref.read(logoutControllerProvider);
     final language = AppLanguageX.fromLocale(locale);
     final theme = ThemePreferenceX.fromThemeMode(themeMode);
 
@@ -85,12 +86,15 @@ class MoreScreen extends ConsumerWidget {
         ),
         ListTile(
           leading: const Icon(Icons.logout),
-          title: Text(l10n.moreLogout),
+          title: Text(l10n.logout),
           subtitle: Text(l10n.moreLogoutSubtitle),
           onTap: () async {
             final confirmed = await showLogoutConfirmationDialog(context);
             if (confirmed) {
-              await ref.read(authViewModelProvider.notifier).logout();
+              await logoutController.logout(
+                context: context,
+                showMessage: true,
+              );
             }
           },
         ),

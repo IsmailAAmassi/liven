@@ -8,16 +8,16 @@ Future<bool> showLogoutConfirmationDialog(BuildContext context) async {
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: Text(l10n.logoutConfirmationTitle),
-        content: Text(l10n.logoutConfirmationMessage),
+        title: Text(l10n.logout),
+        content: Text(l10n.logout_confirm_message),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l10n.logoutConfirmationCancel),
+            child: Text(l10n.logout_cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: Text(l10n.logoutConfirmationConfirm),
+            child: Text(l10n.logout_ok),
           ),
         ],
       );

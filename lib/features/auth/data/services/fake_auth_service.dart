@@ -2,7 +2,6 @@ import 'package:liven/features/auth/domain/entities/user.dart';
 
 import '../../../../core/network/api_result.dart';
 import '../../../../core/services/auth_storage.dart';
-import '../../../../core/utils/unit.dart';
 import '../../domain/models/auth_result.dart';
 import '../../domain/models/auth_session.dart';
 import '../../domain/models/forgot_password_result.dart';
@@ -128,10 +127,9 @@ class FakeAuthService implements AuthRepository {
   }
 
   @override
-  Future<EmptyResult> logout() async {
+  Future<void> logout() async {
     await Future.delayed(const Duration(milliseconds: 300));
-    await _storage.clear();
-    return const ApiSuccess(Unit.instance);
+    await _storage.clearAuth();
   }
 
   @override
@@ -157,7 +155,7 @@ class FakeAuthService implements AuthRepository {
 
   @override
   Future<void> clearAuth() {
-    return _storage.clear();
+    return _storage.clearAuth();
   }
 
   @override

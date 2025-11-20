@@ -279,19 +279,8 @@ class RealAuthService implements AuthRepository {
   }
 
   @override
-  Future<EmptyResult> logout() async {
-    final result = await _api.post<Map<String, dynamic>>(
-      Endpoints.logout,
-      parser: _asMap,
-    );
-
-    return result.when(
-      success: (_) async {
-        await _storage.clear();
-        return const ApiSuccess(Unit.instance);
-      },
-      failure: (error) => ApiError(_asFailure(error)),
-    );
+  Future<void> logout() async {
+    await _storage.clearAuth();
   }
 
   @override
@@ -382,7 +371,7 @@ class RealAuthService implements AuthRepository {
 
   @override
   Future<void> clearAuth() {
-    return _storage.clear();
+    return _storage.clearAuth();
   }
 
   Future<AuthResult> _handleLoginSuccess(Map<String, dynamic> payload) async {

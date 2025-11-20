@@ -195,6 +195,11 @@ abstract class AppLocalizations {
   String get logoutConfirmationMessage;
   String get logoutConfirmationCancel;
   String get logoutConfirmationConfirm;
+  String get logout;
+  String get logout_success;
+  String get logout_confirm_message;
+  String get logout_cancel;
+  String get logout_ok;
   String get mainBackToExitMessage;
   String get forgotPasswordDescription;
   String get authLoginFailed;

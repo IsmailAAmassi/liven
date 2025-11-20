@@ -7,6 +7,7 @@ import '../../../core/router/app_router.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../auth/presentation/login_screen.dart';
 import '../../main/presentation/main_screen.dart';
+import '../../auth/application/logout_controller.dart';
 import '../../onboarding/presentation/onboarding_screen.dart';
 import '../../profile/application/profile_completion_guard.dart';
 import '../../profile/presentation/complete_profile_screen.dart';
@@ -49,11 +50,19 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     final guard = ref.read(profileCompletionGuardProvider);
     final profileCompleted =
         await ref.read(authStorageProvider).getProfileCompleted() ?? true;
+    final logoutController = ref.read(logoutControllerProvider);
 
     if (!onboardingCompleted) {
       router.go(OnboardingScreen.routePath);
     } else if (authStatus == AuthStatus.authenticated ||
         authStatus == AuthStatus.guest) {
+      if (authStatus == AuthStatus.authenticated) {
+        final hasToken =
+            await logoutController.ensureValidAuthToken(context: context);
+        if (!hasToken) {
+          return;
+        }
+      }
       if (authStatus == AuthStatus.authenticated) {
         final shouldShow =
             await guard.shouldShowCompletion(profileCompleted: profileCompleted);
