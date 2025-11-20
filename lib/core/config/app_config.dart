@@ -6,8 +6,8 @@ class AppConfig {
     defaultValue: 'https://liven-sa.com/api',
   );
 
-  static const String homeWebUrl = String.fromEnvironment(
-    'APP_HOME_WEB_URL',
+  static const String webAppUrl = String.fromEnvironment(
+    'APP_WEB_APP_URL',
     defaultValue: 'https://app.liven-sa.com/',
   );
 

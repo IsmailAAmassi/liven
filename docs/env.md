@@ -36,7 +36,7 @@ If you only need to override one value temporarily, you can still fall back to e
 flutter run \
   --dart-define APP_BASE_URL=https://staging.example.com/api \
   --dart-define USE_FAKE_AUTH=false \
-  --dart-define APP_HOME_WEB_URL=https://liven-sa.com/
+  --dart-define APP_WEB_APP_URL=https://liven-sa.com/
 ```
 
 When no value is supplied, `AppConfig` falls back to the defaults declared in
