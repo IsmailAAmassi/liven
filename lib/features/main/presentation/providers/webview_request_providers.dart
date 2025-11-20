@@ -23,7 +23,7 @@ final homeWebRequestProvider = FutureProvider<TabWebRequest>((ref) async {
 
   final baseUrl = settings.appUrl.isNotEmpty
       ? settings.appUrl
-      : (settings.baseUrl.isNotEmpty ? settings.baseUrl : AppConfig.homeWebUrl);
+      : (settings.baseUrl.isNotEmpty ? settings.baseUrl : AppConfig.webAppUrl);
 
   final queryParameters = _userIdParams(user);
   final uri = _buildWebUri(
@@ -58,13 +58,13 @@ final statisticsWebRequestProvider = FutureProvider<TabWebRequest>((ref) async {
 });
 
 String _resolveContentBase(SettingsData settings) {
-  if (settings.baseUrl.isNotEmpty) {
-    return settings.baseUrl;
-  }
   if (settings.appUrl.isNotEmpty) {
     return settings.appUrl;
   }
-  return AppConfig.homeWebUrl;
+  if (settings.baseUrl.isNotEmpty) {
+    return settings.baseUrl;
+  }
+  return AppConfig.webAppUrl;
 }
 
 Map<String, String> _userIdParams(User? user) {
