@@ -15,6 +15,10 @@ class AppConfig {
     const String.fromEnvironment('USE_FAKE_AUTH', defaultValue: 'true'),
   );
 
+  static final bool useFakeSettings = _parseBool(
+    const String.fromEnvironment('USE_FAKE_SETTINGS', defaultValue: 'true'),
+  );
+
   static bool _parseBool(String value) {
     final normalized = value.toLowerCase().trim();
     if (normalized == 'true' || normalized == '1') {

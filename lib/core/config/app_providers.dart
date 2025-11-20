@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../network/api_client.dart';
+import '../network/api_error_mapper.dart';
 import '../permissions/app_permission.dart';
 import '../permissions/permission_controller.dart';
 import '../permissions/permission_status_notifier.dart';
@@ -11,6 +12,10 @@ import '../services/auth_storage.dart';
 import '../services/local_storage_service.dart';
 import '../services/permission_service.dart';
 import 'app_enums.dart';
+
+final apiErrorMapperProvider = Provider<ApiErrorMapper>((ref) {
+  return const ApiErrorMapper();
+});
 
 final localStorageServiceProvider = Provider<LocalStorageService>((ref) {
   throw UnimplementedError('LocalStorageService not initialized');
