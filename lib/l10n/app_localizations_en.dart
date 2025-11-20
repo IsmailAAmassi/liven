@@ -274,6 +274,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String otpResetMessage(String identifier) =>
       'Verify your reset request for $identifier.';
   @override
+  String get otpInvalid => 'Invalid OTP.';
+  @override
+  String get otpRequired => 'Please enter the OTP.';
+  @override
+  String get otpSentMessage => 'OTP has been sent to your mobile.';
+  @override
+  String get otpInvalidMobile => 'Invalid mobile number.';
+  @override
+  String get otpGenericError => 'Could not verify the OTP. Please try again.';
+  @override
+  String otpResendInXSeconds(int seconds) => 'Resend in ${seconds}s';
+  @override
   String get verifyButton => 'Verify';
   @override
   String get resetPasswordAppBar => 'Reset password';

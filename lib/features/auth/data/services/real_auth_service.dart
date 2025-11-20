@@ -9,6 +9,8 @@ import '../../../../core/utils/unit.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/models/auth_result.dart';
 import '../../domain/models/auth_session.dart';
+import '../../domain/models/otp_send_result.dart';
+import '../../domain/models/otp_verify_result.dart';
 import '../../domain/models/register_result.dart';
 import '../../domain/repositories/auth_repository.dart';
 
@@ -115,11 +117,108 @@ class RealAuthService implements AuthRepository {
   }
 
   @override
-  Future<EmptyResult> verifyOtp(String code) async {
-    final response = await _apiClient.post(_verifyOtpPath, body: {
-      'code': code,
-    });
-    return _handleEmptyResult(response);
+  Future<OtpVerifyResult> verifyOtp({
+    required String phone,
+    required String otpCode,
+  }) async {
+    try {
+      final response = await _apiClient.post(_verifyOtpPath, body: {
+        'phone': phone,
+        'otp_code': otpCode,
+      });
+      if (response.isSuccessful) {
+        final payload = _parsePayload(response.data);
+        final status = payload['status'] == true;
+        if (status) {
+          final token = payload['token']?.toString() ?? '';
+          final userId = _parseId(payload);
+          final profileCompleted = payload['profile_completed'] as bool? ?? true;
+          final parsedPhone = _parsePhone(payload['data'], fallback: phone);
+          await _storage.saveAuthToken(token);
+          await _storage.saveUserId(userId);
+          await _storage.saveUserPhone(parsedPhone);
+          await _storage.saveProfileCompleted(profileCompleted);
+          return OtpVerifyResult.success(
+            userId: userId,
+            token: token,
+            phone: parsedPhone,
+            profileCompleted: profileCompleted,
+            message: payload['message'] as String?,
+          );
+        }
+        return OtpVerifyResult.failure(
+          message: payload['message'] as String?,
+          messageKey: 'otp_invalid',
+        );
+      }
+      if (response.statusCode == 422) {
+        final errors = _parseErrors(response.data);
+        final message = _extractMessage(response.data);
+        return OtpVerifyResult.failure(
+          message: message,
+          errors: errors,
+          messageKey: errors.isNotEmpty ? 'otp_required' : 'otp_invalid',
+        );
+      }
+      final failure = _errorMapper.map(response.statusCode, response.data);
+      return OtpVerifyResult.failure(
+        message: failure.details?['message'] as String?,
+        messageKey: failure.messageKey ?? 'otp_generic_error',
+      );
+    } on SocketException catch (_) {
+      return const OtpVerifyResult.failure(messageKey: 'error_network');
+    } on TimeoutException catch (_) {
+      return const OtpVerifyResult.failure(messageKey: 'error_network');
+    } catch (_) {
+      return const OtpVerifyResult.failure(messageKey: 'otp_generic_error');
+    }
+  }
+
+  @override
+  Future<OtpSendResult> sendOtp({required String phone}) async {
+    try {
+      final response = await _apiClient.post(_sendOtpPath, body: {
+        'phone': phone,
+      });
+      if (response.isSuccessful) {
+        final payload = _parsePayload(response.data);
+        final status = payload['status'] == true;
+        if (status) {
+          return OtpSendResult.success(message: payload['message'] as String?);
+        }
+        return OtpSendResult.failure(
+          message: payload['message'] as String?,
+          messageKey: 'otp_generic_error',
+        );
+      }
+      if (response.statusCode == 400) {
+        final payload = _parsePayload(response.data);
+        return OtpSendResult.failure(
+          message: payload['message'] as String?,
+          messageKey: 'otp_invalid_mobile',
+        );
+      }
+      if (response.statusCode == 422) {
+        final errors = _parseErrors(response.data);
+        final message = _extractMessage(response.data);
+        return OtpSendResult.failure(
+          message: message,
+          errors: errors,
+          messageKey: errors.isNotEmpty ? 'otp_required' : 'otp_generic_error',
+        );
+      }
+      final failure = _errorMapper.map(response.statusCode, response.data);
+      return OtpSendResult.failure(
+        message: failure.details?['message'] as String?,
+        messageKey: failure.messageKey ?? 'otp_generic_error',
+      );
+    } on SocketException catch (_) {
+      return const OtpSendResult.failure(messageKey: 'error_network');
+    } on TimeoutException catch (_) {
+      return const OtpSendResult.failure(messageKey: 'error_network');
+    } catch (_) {
+      return const OtpSendResult.failure(messageKey: 'otp_generic_error');
+    }
   }
 
   @override
@@ -166,6 +265,7 @@ class RealAuthService implements AuthRepository {
     final token = payload['token']?.toString() ?? '';
     final userId = _parseId(payload);
     final profileCompleted = payload['profile_completed'] as bool? ?? true;
+    await _storage.saveProfileCompleted(profileCompleted);
     final session = AuthSession(
       token: token,
       userId: userId,
@@ -181,14 +281,16 @@ class RealAuthService implements AuthRepository {
     final token = payload['token']?.toString() ?? '';
     final userJson = _parseUser(payload);
     final user = User.fromJson(userJson);
+    final profileCompleted = payload['profile_completed'] as bool? ?? true;
     final session = AuthSession(
       token: token,
       userId: _parseId(payload, fallbackUser: user),
-      profileCompleted: payload['profile_completed'] as bool? ?? true,
+      profileCompleted: profileCompleted,
     );
     await _storage.saveAuthToken(token);
     await _storage.saveUserId(session.userId);
     await _storage.saveUser(user);
+    await _storage.saveProfileCompleted(profileCompleted);
     return ApiSuccess(session);
   }
 
@@ -204,6 +306,17 @@ class RealAuthService implements AuthRepository {
       return data;
     }
     return <String, dynamic>{};
+  }
+
+  String _parsePhone(dynamic data, {String fallback = ''}) {
+    var phone = data?.toString() ?? '';
+    if (phone.isEmpty) {
+      phone = fallback;
+    }
+    if (phone.isNotEmpty && !phone.startsWith('0') && fallback.startsWith('0')) {
+      phone = '0$phone';
+    }
+    return phone;
   }
 
   List<String> _parseErrors(dynamic data) {

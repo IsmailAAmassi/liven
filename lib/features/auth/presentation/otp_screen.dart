@@ -6,6 +6,7 @@ import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/otp_code_input.dart';
 import '../../../l10n/app_localizations.dart';
 import 'auth_view_model.dart';
+import 'otp_view_model.dart';
 
 class OtpScreen extends ConsumerStatefulWidget {
   const OtpScreen({super.key, required this.args});
@@ -24,14 +25,14 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
   String _code = '';
 
   void _submit() {
-    if ((_formKey.currentState?.validate() ?? false) && _code.length == 6) {
-      ref.read(authViewModelProvider.notifier).verifyOtp(_code, widget.args);
+    if ((_formKey.currentState?.validate() ?? false) && _code.length == 4) {
+      ref.read(otpViewModelProvider(widget.args).notifier).verifyOtp(_code);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(authViewModelProvider);
+    final state = ref.watch(otpViewModelProvider(widget.args));
     final isRegisterFlow = widget.args.flowType == OtpFlowType.register;
     final l10n = AppLocalizations.of(context)!;
 
@@ -63,6 +64,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                 ),
                 const SizedBox(height: 24),
                 OtpCodeInput(
+                  length: 4,
                   onChanged: (value) => setState(() => _code = value),
                   onCompleted: (value) {
                     setState(() => _code = value);
@@ -76,11 +78,39 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                     style: TextStyle(color: Theme.of(context).colorScheme.error),
                   ),
                 ],
+                if (state.successMessage != null) ...[
+                  const SizedBox(height: 16),
+                  Text(
+                    state.successMessage!,
+                    style: TextStyle(color: Theme.of(context).colorScheme.primary),
+                  ),
+                ],
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    TextButton(
+                      onPressed: state.canResend
+                          ? () => ref.read(otpViewModelProvider(widget.args).notifier).resendOtp()
+                          : null,
+                      child: state.secondsRemaining > 0
+                          ? Text(l10n.otpResendInXSeconds(state.secondsRemaining))
+                          : Text(l10n.sendOtpButton),
+                    ),
+                    if (state.isResending) ...[
+                      const SizedBox(width: 8),
+                      const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    ],
+                  ],
+                ),
                 const Spacer(),
                 AppButton(
                   label: l10n.verifyButton,
                   onPressed: _submit,
-                  isLoading: state.isLoading,
+                  isLoading: state.isVerifying,
                 ),
               ],
             ),

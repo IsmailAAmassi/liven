@@ -152,6 +152,12 @@ abstract class AppLocalizations {
   String get otpEnterCodeMessage;
   String otpRegisterMessage(String identifier);
   String otpResetMessage(String identifier);
+  String get otpInvalid;
+  String get otpRequired;
+  String get otpSentMessage;
+  String get otpInvalidMobile;
+  String get otpGenericError;
+  String otpResendInXSeconds(int seconds);
   String get verifyButton;
   String get resetPasswordAppBar;
   String get resetPasswordButton;
