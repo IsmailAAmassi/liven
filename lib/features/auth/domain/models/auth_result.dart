@@ -1,4 +1,4 @@
 import '../../../../core/network/api_result.dart';
-import '../entities/user.dart';
+import 'auth_session.dart';
 
-typedef AuthResult = ApiResult<User>;
+typedef AuthResult = ApiResult<AuthSession>;

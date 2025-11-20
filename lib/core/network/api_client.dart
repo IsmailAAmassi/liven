@@ -48,7 +48,7 @@ class ApiClient {
   }
 
   Future<Map<String, String>> _headers() async {
-    final token = await _storage.getToken();
+    final token = await _storage.getAuthToken();
     final headers = <String, String>{
       'Content-Type': 'application/json',
       'Accept': 'application/json',

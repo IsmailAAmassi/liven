@@ -199,7 +199,12 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get loginSubtitle => 'Sign in to continue your journey.';
   @override
-  String get fieldEmailOrPhone => 'Email or phone';
+  String get completeProfileTitle => 'Complete your profile';
+  @override
+  String get completeProfilePlaceholder =>
+      'Add your details to continue. Coming soon.';
+  @override
+  String get fieldPhone => 'Phone number';
   @override
   String get fieldPassword => 'Password';
   @override
@@ -213,7 +218,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get validationRequiredField => 'This field is required.';
   @override
-  String get validationEmailOrPhone => 'Please enter your email or phone.';
+  String get validationPhone => 'Please enter your phone number.';
   @override
   String get validationEmail => 'Enter a valid email.';
   @override
@@ -304,7 +309,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get forgotPasswordDescription =>
       'Enter the identifier used on your account to receive a reset code.';
   @override
-  String get errorInvalidCredentials => 'Please enter valid credentials.';
+  String get authLoginFailed => 'Could not login. Please try again.';
+  @override
+  String get authInvalidCredentials => 'Incorrect phone or password.';
   @override
   String get errorInvalidRegistration =>
       'Please provide valid registration data.';
@@ -314,6 +321,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorInvalidResetData => 'Invalid reset data.';
   @override
   String get errorIncorrectOtp => 'Incorrect OTP code.';
+  @override
+  String get errorNetwork =>
+      'Network error. Check your connection and try again.';
   @override
   String get settings_load_error =>
       'Could not load settings. Please try again.';

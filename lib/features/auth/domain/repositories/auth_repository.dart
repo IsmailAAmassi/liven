@@ -4,8 +4,9 @@ import '../models/auth_result.dart';
 
 abstract interface class AuthRepository {
   Future<AuthResult> login({
-    required String identifier,
+    required String phone,
     required String password,
+    String? fcmToken,
   });
 
   Future<AuthResult> register({
