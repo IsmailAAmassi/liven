@@ -41,7 +41,8 @@ String _resolveContentBase(SettingsData settings) {
 
 Map<String, String> _userIdParams(User? user) {
   if (user == null || user.id.isEmpty) {
-    return const {};
+    // Guest user id
+    return const {'user_id': '16'};
   }
   return {'user_id': user.id};
 }

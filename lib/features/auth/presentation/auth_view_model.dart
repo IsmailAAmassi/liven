@@ -277,7 +277,7 @@ class AuthViewModel extends StateNotifier<AuthState> {
       return result.message;
     }
     if (result.messageKey != null) {
-      return _mapFailure(ApiFailure(messageKey: result.messageKey));
+      return _mapFailure(ApiFailure(messageKey: result.messageKey!));
     }
     return l10n.otpGenericError;
   }
@@ -292,7 +292,7 @@ class AuthViewModel extends StateNotifier<AuthState> {
       return result.message;
     }
     if (result.messageKey != null) {
-      return _mapFailure(ApiFailure(messageKey: result.messageKey));
+      return _mapFailure(ApiFailure(messageKey: result.messageKey!));
     }
     return l10n.errorGeneric;
   }

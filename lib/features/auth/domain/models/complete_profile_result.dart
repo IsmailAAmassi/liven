@@ -11,11 +11,17 @@ class CompleteProfileResult {
   });
 
   const CompleteProfileResult.success({
-    this.message,
-    this.userId,
-    this.token,
-    this.phone,
-  }) : this._(success: true);
+    String? message,
+    int? userId,
+    String? token,
+    String? phone,
+  }) : this._(
+    success: true,
+    message: message,
+    userId: userId,
+    token: token,
+    phone: phone,
+  );
 
   const CompleteProfileResult.failure({
     String? message,
@@ -23,12 +29,12 @@ class CompleteProfileResult {
     Map<String, String>? fieldErrors,
     String? messageKey,
   }) : this._(
-          success: false,
-          message: message,
-          errors: errors,
-          fieldErrors: fieldErrors,
-          messageKey: messageKey,
-        );
+    success: false,
+    message: message,
+    errors: errors,
+    fieldErrors: fieldErrors,
+    messageKey: messageKey,
+  );
 
   final bool success;
   final String? message;
