@@ -38,6 +38,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get webviewRetryButton => 'إعادة المحاولة';
   @override
+  String get webviewErrorInlineMessage => 'تعذّر تحميل الصفحة الآن.';
+  @override
+  String get webviewPullToRefreshHint => 'اسحب للأسفل لتحديث الصفحة.';
+  @override
   String get homeWelcomeTitle => 'مرحبًا 👋';
   @override
   String get homeWelcomeSubtitle =>

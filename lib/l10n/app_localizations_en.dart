@@ -38,6 +38,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get webviewRetryButton => 'Try again';
   @override
+  String get webviewErrorInlineMessage => 'Unable to load the page right now.';
+  @override
+  String get webviewPullToRefreshHint => 'Pull down to refresh the page.';
+  @override
   String get homeWelcomeTitle => 'Hello there 👋';
   @override
   String get homeWelcomeSubtitle =>

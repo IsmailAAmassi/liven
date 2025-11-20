@@ -15,6 +15,8 @@
   "webviewConfigError": "We're missing the home web URL. Verify APP_WEB_APP_URL in your environment.",
   "webviewSettingsError": "We couldn't load the page URL from settings. Refresh and try again.",
   "webviewRetryButton": "Try again",
+  "webviewErrorInlineMessage": "Unable to load the page right now.",
+  "webviewPullToRefreshHint": "Pull down to refresh the page.",
   "homeWelcomeTitle": "Hello there 👋",
   "homeWelcomeSubtitle": "Switch languages, toggle the theme, and manage security from settings.",
   "homeCardTitle": "Ready for action",
