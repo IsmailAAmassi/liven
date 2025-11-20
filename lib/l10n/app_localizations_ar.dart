@@ -256,7 +256,7 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get forgotPasswordAppBar => 'نسيت كلمة المرور';
   @override
-  String get forgotPasswordTitle => 'طلب رابط إعادة التعيين';
+  String get forgotPasswordTitle => 'إعادة تعيين كلمة المرور';
   @override
   String get sendOtpButton => 'إرسال الرمز';
   @override
@@ -286,7 +286,9 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get resetPasswordAppBar => 'إعادة تعيين كلمة المرور';
   @override
-  String get resetPasswordButton => 'إعادة التعيين';
+  String get resetPasswordSuccessMessage => 'تم إعادة تعيين كلمة المرور بنجاح.';
+  @override
+  String get resetPasswordButton => 'إعادة تعيين كلمة المرور';
   @override
   String get termsTitle => 'شروط الاستخدام';
   @override
@@ -328,7 +330,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get mainBackToExitMessage => 'اضغط رجوع مرة أخرى للخروج';
   @override
   String get forgotPasswordDescription =>
-      'أدخل المعرف المستخدم في حسابك للحصول على رمز إعادة التعيين.';
+      'أدخل رقم جوالك لاستلام رمز التحقق لإعادة تعيين كلمة المرور.';
   @override
   String get authLoginFailed => 'تعذر تسجيل الدخول، حاول مرة أخرى.';
   @override

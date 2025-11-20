@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text.dart';
+import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/otp_code_input.dart';
 import '../../../l10n/app_localizations.dart';
 import 'auth_view_model.dart';
@@ -23,6 +24,22 @@ class OtpScreen extends ConsumerStatefulWidget {
 class _OtpScreenState extends ConsumerState<OtpScreen> {
   final _formKey = GlobalKey<FormState>();
   String _code = '';
+  late final TextEditingController _phoneController;
+
+  @override
+  void initState() {
+    super.initState();
+    _phoneController = TextEditingController(text: widget.args.phone);
+    _phoneController.addListener(() {
+      ref.read(otpViewModelProvider(widget.args).notifier).updatePhone(_phoneController.text.trim());
+    });
+  }
+
+  @override
+  void dispose() {
+    _phoneController.dispose();
+    super.dispose();
+  }
 
   void _submit() {
     if ((_formKey.currentState?.validate() ?? false) && _code.length == 4) {
@@ -33,7 +50,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(otpViewModelProvider(widget.args));
-    final isRegisterFlow = widget.args.flowType == OtpFlowType.register;
+    final isRegisterFlow = widget.args.flowType == OtpFlow.register;
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
@@ -51,10 +68,22 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                AppTextField(
+                  label: l10n.fieldPhone,
+                  controller: _phoneController,
+                  keyboardType: TextInputType.phone,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return l10n.validationPhone;
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 12),
                 AppText(
                   isRegisterFlow
-                      ? l10n.otpRegisterMessage(widget.args.identifier)
-                      : l10n.otpResetMessage(widget.args.identifier),
+                      ? l10n.otpRegisterMessage(state.phone)
+                      : l10n.otpResetMessage(state.phone),
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 const SizedBox(height: 8),

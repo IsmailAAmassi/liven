@@ -259,7 +259,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get forgotPasswordAppBar => 'Forgot password';
   @override
-  String get forgotPasswordTitle => 'Request reset link';
+  String get forgotPasswordTitle => 'Reset your password';
   @override
   String get sendOtpButton => 'Send OTP';
   @override
@@ -289,6 +289,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get verifyButton => 'Verify';
   @override
   String get resetPasswordAppBar => 'Reset password';
+  @override
+  String get resetPasswordSuccessMessage => 'Your password has been reset successfully.';
   @override
   String get resetPasswordButton => 'Reset password';
   @override
@@ -332,7 +334,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mainBackToExitMessage => 'Press back again to exit';
   @override
   String get forgotPasswordDescription =>
-      'Enter the identifier used on your account to receive a reset code.';
+      'Enter your phone number to receive a verification code to reset your password.';
   @override
   String get authLoginFailed => 'Could not login. Please try again.';
   @override

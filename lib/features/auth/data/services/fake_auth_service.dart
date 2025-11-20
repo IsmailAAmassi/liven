@@ -3,9 +3,11 @@ import '../../../../core/services/auth_storage.dart';
 import '../../../../core/utils/unit.dart';
 import '../../domain/models/auth_result.dart';
 import '../../domain/models/auth_session.dart';
+import '../../domain/models/forgot_password_result.dart';
 import '../../domain/models/otp_send_result.dart';
 import '../../domain/models/otp_verify_result.dart';
 import '../../domain/models/register_result.dart';
+import '../../domain/models/reset_password_result.dart';
 import '../../domain/repositories/auth_repository.dart';
 
 class FakeAuthService implements AuthRepository {
@@ -54,12 +56,12 @@ class FakeAuthService implements AuthRepository {
   }
 
   @override
-  Future<EmptyResult> requestPasswordReset(String identifier) async {
+  Future<ForgotPasswordResult> forgotPassword({required String phone}) async {
     await Future.delayed(const Duration(milliseconds: 600));
-    if (identifier.isEmpty) {
-      return const ApiError(ApiFailure(messageKey: 'errorIdentifierRequired'));
+    if (phone.isEmpty) {
+      return const ForgotPasswordResult.failure(messageKey: 'validationPhoneRequired');
     }
-    return const ApiSuccess(Unit.instance);
+    return const ForgotPasswordResult.success(message: 'OTP has been sent to your mobile.');
   }
 
   @override
@@ -98,15 +100,28 @@ class FakeAuthService implements AuthRepository {
   }
 
   @override
-  Future<EmptyResult> resetPassword({
-    required String identifier,
+  Future<ResetPasswordResult> resetPassword({
+    required String phone,
     required String password,
+    required String passwordConfirmation,
   }) async {
     await Future.delayed(const Duration(milliseconds: 600));
-    if (identifier.isEmpty || password.length < 6) {
-      return const ApiError(ApiFailure(messageKey: 'errorInvalidResetData'));
+    if (phone.isEmpty) {
+      return const ResetPasswordResult.failure(messageKey: 'validationPhoneRequired');
     }
-    return const ApiSuccess(Unit.instance);
+    if (password.length < 6) {
+      return const ResetPasswordResult.failure(
+        errors: ['The password must be at least 6 characters.'],
+        messageKey: 'error_validation',
+      );
+    }
+    if (password != passwordConfirmation) {
+      return const ResetPasswordResult.failure(
+        errors: ['The password confirmation does not match.'],
+        messageKey: 'error_validation',
+      );
+    }
+    return const ResetPasswordResult.success(message: 'Password reset successfully.');
   }
 
   @override
