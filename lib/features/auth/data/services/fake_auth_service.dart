@@ -16,13 +16,14 @@ class FakeAuthService implements AuthRepository {
   Future<AuthResult> login({
     required String identifier,
     required String password,
+    String? fcmToken,
   }) async {
     await Future.delayed(const Duration(milliseconds: 600));
     if (identifier.isEmpty || password.isEmpty) {
       return const ApiError(ApiFailure(messageKey: 'errorInvalidCredentials'));
     }
     final user = _buildUser(identifier: identifier);
-    await _persistSession(user);
+    await _persistSession(user, backendFcmToken: fcmToken);
     return ApiSuccess(user);
   }
 
@@ -31,13 +32,14 @@ class FakeAuthService implements AuthRepository {
     required String name,
     required String email,
     required String password,
+    String? fcmToken,
   }) async {
     await Future.delayed(const Duration(milliseconds: 800));
     if (name.isEmpty || email.isEmpty || password.length < 6) {
       return const ApiError(ApiFailure(messageKey: 'errorInvalidRegistration'));
     }
     final user = User(id: '2', name: name, email: email);
-    await _persistSession(user);
+    await _persistSession(user, backendFcmToken: fcmToken);
     return ApiSuccess(user);
   }
 
@@ -108,8 +110,11 @@ class FakeAuthService implements AuthRepository {
     );
   }
 
-  Future<void> _persistSession(User user) async {
+  Future<void> _persistSession(User user, {String? backendFcmToken}) async {
     await _storage.saveToken(_token);
     await _storage.saveUser(user);
+    if (backendFcmToken != null && backendFcmToken.isNotEmpty) {
+      await _storage.saveBackendFcmToken(backendFcmToken);
+    }
   }
 }

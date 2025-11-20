@@ -32,6 +32,10 @@ Zoom calling is available directly from the home tab through the official `flutt
 - How to generate secure session tokens on the backend.
 - Testing tips for the in-app "Join Zoom session" CTA.
 
+## Push notifications
+
+Review [`docs/notifications.md`](docs/notifications.md) for Firebase configuration, token sync logic, and how `FcmService` hooks into the auth flow and localized permission prompts.
+
 ## Localization
 
 English and Arabic strings live inside `lib/l10n`. Run `flutter gen-l10n` to regenerate strongly typed accessors after editing the `.arb` files.

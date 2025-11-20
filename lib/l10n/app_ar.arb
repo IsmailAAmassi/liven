@@ -179,6 +179,12 @@
   "permissionNotificationsStatusDescription": "مطلوبة للتنبيهات الفورية والمحلية.",
   "permissionStorageStatusDescription": "ضرورية لقراءة الصور والملفات وحفظها.",
   "permissionCameraStatusDescription": "ضرورية لاستخدام Zoom وميزات الكاميرا الأخرى.",
+  "notificationsPermissionTitle": "ابقَ على اطلاع",
+  "notificationsPermissionDescription": "فعّل الإشعارات لتصلك تنبيهات حول الأنشطة والتذكيرات الجديدة.",
+  "notificationsAllowButton": "تفعيل الإشعارات",
+  "notificationsDenyButton": "لاحقًا",
+  "notificationsErrorMessage": "الإشعارات متوقفة. يمكنك تفعيلها من الإعدادات في أي وقت.",
+  "notificationsEnabledMessage": "تم تفعيل الإشعارات، وسنخبرك بكل جديد.",
   "permissionSettingsDialogTitle": "التفعيل من الإعدادات",
   "permissionSettingsDialogDescription": "افتح إعدادات النظام واسمح لـ {permission} للمتابعة.",
   "@permissionSettingsDialogDescription": {

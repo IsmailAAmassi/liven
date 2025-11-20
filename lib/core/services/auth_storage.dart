@@ -16,6 +16,8 @@ class AuthStorage {
 
   static const _tokenKey = 'auth_token';
   static const _userKey = 'auth_user';
+  static const _deviceFcmTokenKey = 'device_fcm_token';
+  static const _backendFcmTokenKey = 'backend_fcm_token';
 
   Future<void> saveToken(String token) async {
     await _prefs.setString(_tokenKey, token);
@@ -54,6 +56,32 @@ class AuthStorage {
     await Future.wait([
       clearToken(),
       clearUser(),
+      clearDeviceFcmToken(),
+      clearBackendFcmToken(),
     ]);
+  }
+
+  Future<void> saveDeviceFcmToken(String token) async {
+    await _prefs.setString(_deviceFcmTokenKey, token);
+  }
+
+  Future<String?> getDeviceFcmToken() async {
+    return _prefs.getString(_deviceFcmTokenKey);
+  }
+
+  Future<void> clearDeviceFcmToken() async {
+    await _prefs.remove(_deviceFcmTokenKey);
+  }
+
+  Future<void> saveBackendFcmToken(String token) async {
+    await _prefs.setString(_backendFcmTokenKey, token);
+  }
+
+  Future<String?> getBackendFcmToken() async {
+    return _prefs.getString(_backendFcmTokenKey);
+  }
+
+  Future<void> clearBackendFcmToken() async {
+    await _prefs.remove(_backendFcmTokenKey);
   }
 }

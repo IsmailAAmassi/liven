@@ -179,6 +179,12 @@
   "permissionNotificationsStatusDescription": "Required for push and local alerts.",
   "permissionStorageStatusDescription": "Needed to read and save photos or documents.",
   "permissionCameraStatusDescription": "Needed for Zoom and other camera features.",
+  "notificationsPermissionTitle": "Stay notified",
+  "notificationsPermissionDescription": "Enable notifications to receive alerts about new activity and reminders.",
+  "notificationsAllowButton": "Enable notifications",
+  "notificationsDenyButton": "Not now",
+  "notificationsErrorMessage": "Notifications are turned off. You can enable them anytime from Settings.",
+  "notificationsEnabledMessage": "Notifications are on—we'll keep you updated.",
   "permissionSettingsDialogTitle": "Enable from settings",
   "permissionSettingsDialogDescription": "Open system settings and allow {permission} to continue.",
   "@permissionSettingsDialogDescription": {

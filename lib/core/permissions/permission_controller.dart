@@ -48,17 +48,26 @@ class PermissionController {
     }
 
     final l10n = AppLocalizations.of(context)!;
+    final confirmLabel = permission == AppPermission.notifications
+        ? l10n.notificationsAllowButton
+        : l10n.permissionActionAllow;
+    final cancelLabel = permission == AppPermission.notifications
+        ? l10n.notificationsDenyButton
+        : l10n.permissionActionNotNow;
     final confirmed = await showPermissionDialog(
       context: context,
       title: permission.dialogTitle(l10n),
       description: permission.dialogDescription(l10n),
-      confirmLabel: l10n.permissionActionAllow,
-      cancelLabel: l10n.permissionActionNotNow,
+      confirmLabel: confirmLabel,
+      cancelLabel: cancelLabel,
     );
 
     if (confirmed != true) {
       if (permission == AppPermission.notifications && trackDismissal) {
         await _service.setNotificationPromptDismissed(true);
+      }
+      if (permission == AppPermission.notifications) {
+        _showNotificationMessage(context, l10n.notificationsErrorMessage);
       }
       return false;
     }
@@ -68,6 +77,9 @@ class PermissionController {
 
     if (permission == AppPermission.notifications && granted) {
       await _service.setNotificationPromptDismissed(true);
+      _showNotificationMessage(context, l10n.notificationsEnabledMessage);
+    } else if (permission == AppPermission.notifications && !granted) {
+      _showNotificationMessage(context, l10n.notificationsErrorMessage);
     }
 
     return granted;
@@ -168,5 +180,19 @@ class PermissionController {
     }
 
     return true;
+  }
+
+  void _showNotificationMessage(BuildContext context, String message) {
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    if (messenger == null) {
+      return;
+    }
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 3),
+      ),
+    );
   }
 }

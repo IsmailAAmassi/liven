@@ -56,7 +56,12 @@ class AuthViewModel extends StateNotifier<AuthState> {
 
   Future<void> login({required String identifier, required String password}) async {
     state = const AuthState(isLoading: true);
-    final result = await _repository.login(identifier: identifier, password: password);
+    final fcmToken = await _ref.read(fcmServiceProvider).getToken();
+    final result = await _repository.login(
+      identifier: identifier,
+      password: password,
+      fcmToken: fcmToken,
+    );
     final errorMessage = _errorFromResult(result);
     if (errorMessage != null) {
       state = state.copyWith(isLoading: false, errorMessage: errorMessage);
@@ -79,7 +84,13 @@ class AuthViewModel extends StateNotifier<AuthState> {
     required String password,
   }) async {
     state = const AuthState(isLoading: true);
-    final result = await _repository.register(name: name, email: email, password: password);
+    final fcmToken = await _ref.read(fcmServiceProvider).getToken();
+    final result = await _repository.register(
+      name: name,
+      email: email,
+      password: password,
+      fcmToken: fcmToken,
+    );
     final errorMessage = _errorFromResult(result);
     if (errorMessage != null) {
       state = state.copyWith(isLoading: false, errorMessage: errorMessage);

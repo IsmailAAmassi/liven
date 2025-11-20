@@ -189,6 +189,12 @@ abstract class AppLocalizations {
   String get permissionNotificationsStatusDescription;
   String get permissionStorageStatusDescription;
   String get permissionCameraStatusDescription;
+  String get notificationsPermissionTitle;
+  String get notificationsPermissionDescription;
+  String get notificationsAllowButton;
+  String get notificationsDenyButton;
+  String get notificationsErrorMessage;
+  String get notificationsEnabledMessage;
   String get permissionSettingsDialogTitle;
   String permissionSettingsDialogDescription(String permission);
   String get permissionDeniedDialogTitle;

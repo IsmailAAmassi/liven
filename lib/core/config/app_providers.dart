@@ -8,6 +8,7 @@ import '../permissions/app_permission.dart';
 import '../permissions/permission_controller.dart';
 import '../permissions/permission_status_notifier.dart';
 import '../services/auth_storage.dart';
+import '../services/fcm_service.dart';
 import '../services/local_storage_service.dart';
 import '../services/permission_service.dart';
 import 'app_enums.dart';
@@ -28,6 +29,15 @@ final apiClientProvider = Provider<ApiClient>((ref) {
 final permissionServiceProvider = Provider<PermissionService>((ref) {
   final storage = ref.watch(localStorageServiceProvider);
   return PermissionService(storage: storage);
+});
+
+final fcmServiceProvider = Provider<FcmService>((ref) {
+  final storage = ref.watch(authStorageProvider);
+  final service = FcmService(storage: storage);
+  ref.onDispose(() {
+    service.dispose();
+  });
+  return service;
 });
 
 final permissionControllerProvider = Provider<PermissionController>((ref) {

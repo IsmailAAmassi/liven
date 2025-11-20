@@ -357,6 +357,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get permissionCameraStatusDescription =>
       'Needed for Zoom and other camera features.';
   @override
+  String get notificationsPermissionTitle => 'Stay notified';
+  @override
+  String get notificationsPermissionDescription =>
+      'Enable notifications to receive alerts about new activity and reminders.';
+  @override
+  String get notificationsAllowButton => 'Enable notifications';
+  @override
+  String get notificationsDenyButton => 'Not now';
+  @override
+  String get notificationsErrorMessage =>
+      'Notifications are turned off. You can enable them anytime from Settings.';
+  @override
+  String get notificationsEnabledMessage =>
+      'Notifications are on—we\'ll keep you updated.';
+  @override
   String get permissionSettingsDialogTitle => 'Enable from settings';
   @override
   String permissionSettingsDialogDescription(String permission) =>

@@ -41,6 +41,14 @@
 <string>UIInterfaceOrientationLandscapeLeft</string>
 <string>UIInterfaceOrientationLandscapeRight</string>
 </array>
+        <!-- Add GoogleService-Info.plist to ios/Runner, enable Push Notifications capability,
+             and upload your APNs key to Firebase so FCM can deliver notifications. -->
+        <key>FirebaseAppDelegateProxyEnabled</key>
+        <true/>
+        <key>UIBackgroundModes</key>
+        <array>
+                <string>remote-notification</string>
+        </array>
 <key>NSPhotoLibraryUsageDescription</key>
 <string>Photo access is needed to read and save files and media.</string>
 <key>NSPhotoLibraryAddUsageDescription</key>

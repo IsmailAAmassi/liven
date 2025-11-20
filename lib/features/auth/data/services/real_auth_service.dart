@@ -24,9 +24,11 @@ class RealAuthService implements AuthRepository {
   Future<AuthResult> login({
     required String identifier,
     required String password,
+    String? fcmToken,
   }) async {
     final payload = _identifierPayload(identifier)
-      ..['password'] = password;
+      ..['password'] = password
+      ..addAll(_fcmPayload(await _resolveFcmToken(fcmToken)));
     final response = await _apiClient.post(_loginPath, body: payload);
     if (response.isSuccessful) {
       return await _handleAuthSuccess(response.data);
@@ -39,12 +41,15 @@ class RealAuthService implements AuthRepository {
     required String name,
     required String email,
     required String password,
+    String? fcmToken,
   }) async {
-    final response = await _apiClient.post(_registerPath, body: {
+    final payload = {
       'name': name,
       'email': email,
       'password': password,
-    });
+      ..._fcmPayload(await _resolveFcmToken(fcmToken)),
+    };
+    final response = await _apiClient.post(_registerPath, body: payload);
     if (response.isSuccessful) {
       return await _handleAuthSuccess(response.data);
     }
@@ -114,6 +119,12 @@ class RealAuthService implements AuthRepository {
     final user = User.fromJson(userJson);
     await _storage.saveToken(token);
     await _storage.saveUser(user);
+    final backendFcmToken = payload['fcm_token'] as String? ??
+        payload['device_fcm_token'] as String? ??
+        userJson['fcm_token'] as String?;
+    if (backendFcmToken != null && backendFcmToken.isNotEmpty) {
+      await _storage.saveBackendFcmToken(backendFcmToken);
+    }
     return ApiSuccess(user);
   }
 
@@ -149,6 +160,20 @@ class RealAuthService implements AuthRepository {
       payload['phone'] = identifier;
     }
     return payload;
+  }
+
+  Future<String?> _resolveFcmToken(String? token) async {
+    if (token != null && token.isNotEmpty) {
+      return token;
+    }
+    return _storage.getDeviceFcmToken();
+  }
+
+  Map<String, dynamic> _fcmPayload(String? token) {
+    if (token == null || token.isEmpty) {
+      return <String, dynamic>{};
+    }
+    return {'fcm_token': token};
   }
 
   String get _loginPath => '/mobile/login';
