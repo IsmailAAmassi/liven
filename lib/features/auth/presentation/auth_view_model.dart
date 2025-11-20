@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/config/app_enums.dart';
 import '../../../core/config/app_providers.dart';
+import '../../../core/network/api_exceptions.dart';
 import '../../../core/network/api_result.dart';
 import '../../../core/router/app_router.dart';
 import '../../../l10n/app_localizations.dart';
@@ -193,12 +194,12 @@ class AuthViewModel extends StateNotifier<AuthState> {
 
   String? _errorFromResult<T>(ApiResult<T> result) {
     if (result is ApiError<T>) {
-      return _mapFailure(result.failure);
+      return _mapFailure(result.error);
     }
     return null;
   }
 
-  String _mapFailure(ApiFailure failure) {
+  String _mapFailure(ApiException failure) {
     final locale = _ref.read(localeProvider);
     final l10n = lookupAppLocalizations(locale);
     switch (failure.messageKey) {

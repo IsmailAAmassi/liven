@@ -13,11 +13,9 @@ final settingsRepositoryProvider = Provider<SettingsRepository>((ref) {
   if (AppConfig.useFakeSettings) {
     return FakeSettingsService(storage: storage);
   }
-  final apiClient = ref.watch(apiClientProvider);
-  final mapper = ref.watch(apiErrorMapperProvider);
+  final api = ref.watch(appApiProvider);
   return RealSettingsService(
-    apiClient: apiClient,
+    api: api,
     storage: storage,
-    errorMapper: mapper,
   );
 });

@@ -1,16 +1,13 @@
-import 'dart:async';
-import 'dart:io';
-
-import '../../../../core/network/api_client.dart';
-import '../../../../core/network/api_error_mapper.dart';
+import '../../../../core/network/api_exceptions.dart';
 import '../../../../core/network/api_result.dart';
+import '../../../../core/network/app_api.dart';
+import '../../../../core/network/endpoint_constants.dart';
 import '../../../../core/services/auth_storage.dart';
-import '../../../../core/utils/unit.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/models/auth_result.dart';
 import '../../domain/models/auth_session.dart';
-import '../../domain/models/forgot_password_result.dart';
 import '../../domain/models/complete_profile_result.dart';
+import '../../domain/models/forgot_password_result.dart';
 import '../../domain/models/otp_send_result.dart';
 import '../../domain/models/otp_verify_result.dart';
 import '../../domain/models/register_result.dart';
@@ -19,16 +16,13 @@ import '../../domain/repositories/auth_repository.dart';
 
 class RealAuthService implements AuthRepository {
   RealAuthService({
-    required ApiClient apiClient,
+    required AppApi api,
     required AuthStorage storage,
-    required ApiErrorMapper errorMapper,
-  })  : _apiClient = apiClient,
-        _storage = storage,
-        _errorMapper = errorMapper;
+  })  : _api = api,
+        _storage = storage;
 
-  final ApiClient _apiClient;
+  final AppApi _api;
   final AuthStorage _storage;
-  final ApiErrorMapper _errorMapper;
 
   @override
   Future<AuthResult> login({
@@ -36,33 +30,32 @@ class RealAuthService implements AuthRepository {
     required String password,
     String? fcmToken,
   }) async {
-    try {
-      final response = await _apiClient.post(_loginPath, body: {
+    final result = await _api.post<Map<String, dynamic>>(
+      Endpoints.login,
+      data: {
         'phone': phone,
         'password': password,
         if (fcmToken != null) 'fcm_token': fcmToken,
-      });
-      if (response.isSuccessful) {
-        return await _handleLoginSuccess(response.data);
-      }
-      if (response.statusCode == 422) {
-        final message = _extractMessage(response.data);
-        return ApiError(
-          ApiFailure(
-            statusCode: response.statusCode,
-            messageKey: 'auth_invalid_credentials',
-            details: {'message': message},
-          ),
-        );
-      }
-      return ApiError(_errorMapper.map(response.statusCode, response.data));
-    } on SocketException catch (_) {
-      return const ApiError(ApiFailure(messageKey: 'error_network'));
-    } on TimeoutException catch (_) {
-      return const ApiError(ApiFailure(messageKey: 'error_network'));
-    } catch (_) {
-      return const ApiError(ApiFailure(messageKey: 'auth_login_failed'));
-    }
+      },
+      parser: _asMap,
+    );
+
+    return result.when(
+      success: (payload) => _handleLoginSuccess(payload),
+      failure: (error) {
+        if (error is ValidationException) {
+          return ApiError(
+            ApiFailure(
+              statusCode: error.statusCode,
+              messageKey: 'auth_invalid_credentials',
+              message: error.message,
+              errors: error.errors,
+            ),
+          );
+        }
+        return ApiError(_asFailure(error, fallbackKey: 'auth_login_failed'));
+      },
+    );
   }
 
   @override
@@ -71,43 +64,43 @@ class RealAuthService implements AuthRepository {
     required String password,
     required String name,
   }) async {
-    try {
-      final response = await _apiClient.post(_registerPath, body: {
+    final result = await _api.post<Map<String, dynamic>>(
+      Endpoints.register,
+      data: {
         'phone': phone,
         'password': password,
         'name': name,
-      });
-      if (response.isSuccessful) {
-        final payload = _parsePayload(response.data);
+      },
+      parser: _asMap,
+    );
+
+    return result.when(
+      success: (payload) {
         final status = payload['status'] == true;
         if (status) {
           return RegisterResult.success(message: payload['message'] as String?);
         }
+        final errors = _parseErrors(payload);
         return RegisterResult.failure(
+          errors: errors.isEmpty ? null : errors,
           message: payload['message'] as String?,
           messageKey: 'auth_register_failed',
         );
-      }
-      if (response.statusCode == 422) {
-        final errors = _parseErrors(response.data);
+      },
+      failure: (error) {
+        if (error is ValidationException) {
+          return RegisterResult.failure(
+            errors: error.errors,
+            message: error.message,
+            messageKey: error.messageKey,
+          );
+        }
         return RegisterResult.failure(
-          errors: errors,
-          message: _extractMessage(response.data),
-          messageKey: 'error_validation',
+          message: _selectMessage(error),
+          messageKey: error.messageKey,
         );
-      }
-      final failure = _errorMapper.map(response.statusCode, response.data);
-      return RegisterResult.failure(
-        message: failure.details?['message'] as String?,
-        messageKey: failure.messageKey,
-      );
-    } on SocketException catch (_) {
-      return const RegisterResult.failure(messageKey: 'error_network');
-    } on TimeoutException catch (_) {
-      return const RegisterResult.failure(messageKey: 'error_network');
-    } catch (_) {
-      return const RegisterResult.failure(messageKey: 'auth_register_failed');
-    }
+      },
+    );
   }
 
   @override
@@ -115,16 +108,20 @@ class RealAuthService implements AuthRepository {
     required String phone,
     required String otpCode,
   }) async {
-    try {
-      final response = await _apiClient.post(_verifyOtpPath, body: {
+    final result = await _api.post<Map<String, dynamic>>(
+      Endpoints.verifyOtp,
+      data: {
         'phone': phone,
         'otp_code': otpCode,
-      });
-      if (response.isSuccessful) {
-        final payload = _parsePayload(response.data);
+      },
+      parser: _asMap,
+    );
+
+    return result.when(
+      success: (payload) async {
         final status = payload['status'] == true;
         if (status) {
-          final token = payload['token']?.toString() ?? '';
+          final token = _parseToken(payload);
           final userId = _parseId(payload);
           final profileCompleted = payload['profile_completed'] as bool? ?? true;
           final parsedPhone = _parsePhone(payload['data'], fallback: phone);
@@ -140,42 +137,40 @@ class RealAuthService implements AuthRepository {
             message: payload['message'] as String?,
           );
         }
+        final errors = _parseErrors(payload);
         return OtpVerifyResult.failure(
           message: payload['message'] as String?,
-          messageKey: 'otp_invalid',
-        );
-      }
-      if (response.statusCode == 422) {
-        final errors = _parseErrors(response.data);
-        final message = _extractMessage(response.data);
-        return OtpVerifyResult.failure(
-          message: message,
           errors: errors,
           messageKey: errors.isNotEmpty ? 'otp_required' : 'otp_invalid',
         );
-      }
-      final failure = _errorMapper.map(response.statusCode, response.data);
-      return OtpVerifyResult.failure(
-        message: failure.details?['message'] as String?,
-        messageKey: failure.messageKey ?? 'otp_generic_error',
-      );
-    } on SocketException catch (_) {
-      return const OtpVerifyResult.failure(messageKey: 'error_network');
-    } on TimeoutException catch (_) {
-      return const OtpVerifyResult.failure(messageKey: 'error_network');
-    } catch (_) {
-      return const OtpVerifyResult.failure(messageKey: 'otp_generic_error');
-    }
+      },
+      failure: (error) {
+        if (error is ValidationException) {
+          final message = error.message ?? 'otp_generic_error';
+          return OtpVerifyResult.failure(
+            message: message,
+            errors: error.errors,
+            messageKey: error.fieldErrors?.isNotEmpty == true ? 'otp_required' : 'otp_generic_error',
+          );
+        }
+        return OtpVerifyResult.failure(
+          message: _selectMessage(error),
+          messageKey: error.messageKey,
+        );
+      },
+    );
   }
 
   @override
   Future<OtpSendResult> sendOtp({required String phone}) async {
-    try {
-      final response = await _apiClient.post(_sendOtpPath, body: {
-        'phone': phone,
-      });
-      if (response.isSuccessful) {
-        final payload = _parsePayload(response.data);
+    final result = await _api.post<Map<String, dynamic>>(
+      Endpoints.sendOtp,
+      data: {'phone': phone},
+      parser: _asMap,
+    );
+
+    return result.when(
+      success: (payload) {
         final status = payload['status'] == true;
         if (status) {
           return OtpSendResult.success(message: payload['message'] as String?);
@@ -184,75 +179,58 @@ class RealAuthService implements AuthRepository {
           message: payload['message'] as String?,
           messageKey: 'otp_generic_error',
         );
-      }
-      if (response.statusCode == 400) {
-        final payload = _parsePayload(response.data);
+      },
+      failure: (error) {
+        if (error is ValidationException || error is BadRequestException) {
+          return OtpSendResult.failure(
+            message: error.message,
+            errors: error.errors,
+            messageKey: 'otp_generic_error',
+          );
+        }
         return OtpSendResult.failure(
-          message: payload['message'] as String?,
-          messageKey: 'otp_invalid_mobile',
+          message: _selectMessage(error),
+          messageKey: error.messageKey,
         );
-      }
-      if (response.statusCode == 422) {
-        final errors = _parseErrors(response.data);
-        final message = _extractMessage(response.data);
-        return OtpSendResult.failure(
-          message: message,
-          errors: errors,
-          messageKey: errors.isNotEmpty ? 'otp_required' : 'otp_generic_error',
-        );
-      }
-      final failure = _errorMapper.map(response.statusCode, response.data);
-      return OtpSendResult.failure(
-        message: failure.details?['message'] as String?,
-        messageKey: failure.messageKey ?? 'otp_generic_error',
-      );
-    } on SocketException catch (_) {
-      return const OtpSendResult.failure(messageKey: 'error_network');
-    } on TimeoutException catch (_) {
-      return const OtpSendResult.failure(messageKey: 'error_network');
-    } catch (_) {
-      return const OtpSendResult.failure(messageKey: 'otp_generic_error');
-    }
+      },
+    );
   }
 
   @override
   Future<ForgotPasswordResult> forgotPassword({required String phone}) async {
-    try {
-      final response = await _apiClient.post(_forgotPasswordPath, body: {
-        'phone': phone,
-      });
-      if (response.isSuccessful) {
-        final payload = _parsePayload(response.data);
+    final result = await _api.post<Map<String, dynamic>>(
+      Endpoints.forgotPassword,
+      data: {'phone': phone},
+      parser: _asMap,
+    );
+
+    return result.when(
+      success: (payload) {
         final status = payload['status'] == true;
         if (status) {
           return ForgotPasswordResult.success(message: payload['message'] as String?);
         }
+        final errors = _parseErrors(payload);
         return ForgotPasswordResult.failure(
           message: payload['message'] as String?,
-          errors: _parseErrors(response.data),
-          messageKey: 'otp_generic_error',
-        );
-      }
-      if (response.statusCode == 422 || response.statusCode == 400) {
-        final errors = _parseErrors(response.data);
-        return ForgotPasswordResult.failure(
-          message: _extractMessage(response.data),
           errors: errors,
           messageKey: errors.isNotEmpty ? 'error_validation' : 'otp_generic_error',
         );
-      }
-      final failure = _errorMapper.map(response.statusCode, response.data);
-      return ForgotPasswordResult.failure(
-        message: failure.details?['message'] as String?,
-        messageKey: failure.messageKey,
-      );
-    } on SocketException catch (_) {
-      return const ForgotPasswordResult.failure(messageKey: 'error_network');
-    } on TimeoutException catch (_) {
-      return const ForgotPasswordResult.failure(messageKey: 'error_network');
-    } catch (_) {
-      return const ForgotPasswordResult.failure(messageKey: 'otp_generic_error');
-    }
+      },
+      failure: (error) {
+        if (error is ValidationException || error is BadRequestException) {
+          return ForgotPasswordResult.failure(
+            message: error.message,
+            errors: error.errors,
+            messageKey: error.messageKey,
+          );
+        }
+        return ForgotPasswordResult.failure(
+          message: _selectMessage(error),
+          messageKey: error.messageKey,
+        );
+      },
+    );
   }
 
   @override
@@ -261,62 +239,72 @@ class RealAuthService implements AuthRepository {
     required String password,
     required String passwordConfirmation,
   }) async {
-    try {
-      final response = await _apiClient.post(_resetPasswordPath, body: {
+    final result = await _api.post<Map<String, dynamic>>(
+      Endpoints.resetPassword,
+      data: {
         'phone': phone,
         'password': password,
         'password_confirmation': passwordConfirmation,
-      });
-      if (response.isSuccessful) {
-        final payload = _parsePayload(response.data);
+      },
+      parser: _asMap,
+    );
+
+    return result.when(
+      success: (payload) {
         final status = payload['status'] == true;
         if (status) {
           return ResetPasswordResult.success(message: payload['message'] as String?);
         }
+        final errors = _parseErrors(payload);
         return ResetPasswordResult.failure(
           message: payload['message'] as String?,
-          errors: _parseErrors(response.data),
-          messageKey: 'error_validation',
-        );
-      }
-      if (response.statusCode == 422 || response.statusCode == 400) {
-        final errors = _parseErrors(response.data);
-        return ResetPasswordResult.failure(
-          message: _extractMessage(response.data),
           errors: errors,
           messageKey: 'error_validation',
         );
-      }
-      final failure = _errorMapper.map(response.statusCode, response.data);
-      return ResetPasswordResult.failure(
-        message: failure.details?['message'] as String?,
-        messageKey: failure.messageKey,
-      );
-    } on SocketException catch (_) {
-      return const ResetPasswordResult.failure(messageKey: 'error_network');
-    } on TimeoutException catch (_) {
-      return const ResetPasswordResult.failure(messageKey: 'error_network');
-    } catch (_) {
-      return const ResetPasswordResult.failure(messageKey: 'error_unknown');
-    }
+      },
+      failure: (error) {
+        if (error is ValidationException || error is BadRequestException) {
+          return ResetPasswordResult.failure(
+            message: error.message,
+            errors: error.errors,
+            messageKey: 'error_validation',
+          );
+        }
+        return ResetPasswordResult.failure(
+          message: _selectMessage(error),
+          messageKey: error.messageKey,
+        );
+      },
+    );
   }
 
   @override
   Future<EmptyResult> logout() async {
-    final response = await _apiClient.post(_logoutPath);
-    if (response.isSuccessful) {
-      await _storage.clear();
-    }
-    return _handleEmptyResult(response);
+    final result = await _api.post<Map<String, dynamic>>(
+      Endpoints.logout,
+      parser: _asMap,
+    );
+
+    return result.when(
+      success: (_) async {
+        await _storage.clear();
+        return const ApiSuccess(Unit.instance);
+      },
+      failure: (error) => ApiError(_asFailure(error)),
+    );
   }
 
   @override
   Future<AuthResult> refreshToken() async {
-    final response = await _apiClient.post(_refreshPath);
-    if (response.isSuccessful) {
-      return await _handleAuthSuccess(response.data);
-    }
-    return ApiError(_errorMapper.map(response.statusCode, response.data));
+    final result = await _api.post<Map<String, dynamic>>(
+      Endpoints.refreshToken,
+      parser: _asMap,
+    );
+
+    return result.when(
+      success: (payload) => _handleAuthSuccess(payload),
+      failure: (error) => ApiError(_asFailure(error)),
+    );
   }
 
   @override
@@ -326,16 +314,19 @@ class RealAuthService implements AuthRepository {
     required int length,
     required int weight,
   }) async {
-    try {
-      final response = await _apiClient.post(_completeProfilePath, body: {
+    final result = await _api.post<Map<String, dynamic>>(
+      Endpoints.completeProfile,
+      data: {
         'age': age,
         'gender': gender,
         'length': length,
         'weight': weight,
-      });
+      },
+      parser: _asMap,
+    );
 
-      if (response.isSuccessful) {
-        final payload = _parsePayload(response.data);
+    return result.when(
+      success: (payload) async {
         final status = payload['status'] == true;
         if (status) {
           final data = _parseData(payload);
@@ -358,37 +349,30 @@ class RealAuthService implements AuthRepository {
             phone: phone.isEmpty ? null : phone,
           );
         }
-        final errors = _parseErrors(response.data);
+        final errors = _parseErrors(payload);
         return CompleteProfileResult.failure(
           message: payload['message'] as String?,
           errors: errors,
           fieldErrors: _mapFieldErrors(errors),
           messageKey: 'error_validation',
         );
-      }
-
-      if (response.statusCode == 422) {
-        final errors = _parseErrors(response.data);
+      },
+      failure: (error) {
+        if (error is ValidationException) {
+          final errors = error.errors ?? const [];
+          return CompleteProfileResult.failure(
+            message: error.message,
+            errors: errors,
+            messageKey: error.messageKey,
+            fieldErrors: _mapFieldErrors(errors),
+          );
+        }
         return CompleteProfileResult.failure(
-          message: _extractMessage(response.data),
-          errors: errors,
-          messageKey: 'error_validation',
-          fieldErrors: _mapFieldErrors(errors),
+          message: _selectMessage(error),
+          messageKey: error.messageKey,
         );
-      }
-
-      final failure = _errorMapper.map(response.statusCode, response.data);
-      return CompleteProfileResult.failure(
-        message: failure.details?['message'] as String?,
-        messageKey: failure.messageKey,
-      );
-    } on SocketException catch (_) {
-      return const CompleteProfileResult.failure(messageKey: 'error_network');
-    } on TimeoutException catch (_) {
-      return const CompleteProfileResult.failure(messageKey: 'error_network');
-    } catch (_) {
-      return const CompleteProfileResult.failure(messageKey: 'error_unknown');
-    }
+      },
+    );
   }
 
   @override
@@ -401,9 +385,8 @@ class RealAuthService implements AuthRepository {
     return _storage.clear();
   }
 
-  Future<AuthResult> _handleLoginSuccess(dynamic data) async {
-    final payload = _parsePayload(data);
-    final token = payload['token']?.toString() ?? '';
+  Future<AuthResult> _handleLoginSuccess(Map<String, dynamic> payload) async {
+    final token = _parseToken(payload);
     final userId = _parseId(payload);
     final profileCompleted = payload['profile_completed'] as bool? ?? true;
     await _storage.saveProfileCompleted(profileCompleted);
@@ -417,9 +400,8 @@ class RealAuthService implements AuthRepository {
     return ApiSuccess(session);
   }
 
-  Future<AuthResult> _handleAuthSuccess(dynamic data) async {
-    final payload = _parsePayload(data);
-    final token = payload['token']?.toString() ?? '';
+  Future<AuthResult> _handleAuthSuccess(Map<String, dynamic> payload) async {
+    final token = _parseToken(payload);
     final userJson = _parseUser(payload);
     final user = User.fromJson(userJson);
     final profileCompleted = payload['profile_completed'] as bool? ?? true;
@@ -433,20 +415,6 @@ class RealAuthService implements AuthRepository {
     await _storage.saveUser(user);
     await _storage.saveProfileCompleted(profileCompleted);
     return ApiSuccess(session);
-  }
-
-  Future<EmptyResult> _handleEmptyResult(ApiClientResponse response) async {
-    if (response.isSuccessful) {
-      return const ApiSuccess(Unit.instance);
-    }
-    return ApiError(_errorMapper.map(response.statusCode, response.data));
-  }
-
-  Map<String, dynamic> _parsePayload(dynamic data) {
-    if (data is Map<String, dynamic>) {
-      return data;
-    }
-    return <String, dynamic>{};
   }
 
   Map<String, dynamic> _parseData(Map<String, dynamic> payload) {
@@ -531,23 +499,21 @@ class RealAuthService implements AuthRepository {
     return fieldErrors;
   }
 
-  String _extractMessage(dynamic data) {
+  Map<String, dynamic> _asMap(dynamic data) {
     if (data is Map<String, dynamic>) {
-      final message = data['message'];
-      if (message is String && message.isNotEmpty) {
-        return message;
-      }
+      return data;
     }
-    return '';
+    return <String, dynamic>{};
   }
 
-  String get _loginPath => '/mobile/login';
-  String get _registerPath => '/mobile/register';
-  String get _sendOtpPath => '/mobile/user/otp/send';
-  String get _verifyOtpPath => '/mobile/user/otp/verify';
-  String get _resetPasswordPath => '/mobile/user/password/forget/update';
-  String get _forgotPasswordPath => '/mobile/forgot';
-  String get _logoutPath => '/mobile/logout';
-  String get _refreshPath => '/mobile/token/refresh';
-  String get _completeProfilePath => '/mobile/register/continue';
+  ApiException _asFailure(ApiException error, {String? fallbackKey}) {
+    if (fallbackKey != null && error is UnknownApiException) {
+      return ApiFailure(messageKey: fallbackKey, message: error.message);
+    }
+    return error;
+  }
+
+  String? _selectMessage(ApiException error) {
+    return error.message ?? error.messageEn ?? error.messageAr;
+  }
 }

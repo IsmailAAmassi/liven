@@ -3,8 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:permission_handler/permission_handler.dart';
 
-import '../network/api_client.dart';
-import '../network/api_error_mapper.dart';
+import '../network/app_api.dart';
+import '../network/dio_client.dart';
+import '../network/dio_interceptors.dart';
 import '../permissions/app_permission.dart';
 import '../permissions/permission_controller.dart';
 import '../permissions/permission_status_notifier.dart';
@@ -12,10 +13,6 @@ import '../services/auth_storage.dart';
 import '../services/local_storage_service.dart';
 import '../services/permission_service.dart';
 import 'app_enums.dart';
-
-final apiErrorMapperProvider = Provider<ApiErrorMapper>((ref) {
-  return const ApiErrorMapper();
-});
 
 final localStorageServiceProvider = Provider<LocalStorageService>((ref) {
   throw UnimplementedError('LocalStorageService not initialized');
@@ -25,9 +22,20 @@ final authStorageProvider = Provider<AuthStorage>((ref) {
   throw UnimplementedError('AuthStorage not initialized');
 });
 
-final apiClientProvider = Provider<ApiClient>((ref) {
-  final storage = ref.watch(authStorageProvider);
-  return ApiClient(storage: storage);
+final dioClientProvider = Provider<DioClient>((ref) {
+  final authStorage = ref.watch(authStorageProvider);
+  final localStorage = ref.watch(localStorageServiceProvider);
+  return DioClient(
+    authInterceptor: AuthInterceptor(storage: authStorage),
+    headerInterceptor: HeaderInterceptor(storage: localStorage),
+  );
+});
+
+final dioProvider = Provider((ref) => ref.watch(dioClientProvider).dio);
+
+final appApiProvider = Provider<AppApi>((ref) {
+  final client = ref.watch(dioClientProvider);
+  return AppApi(client);
 });
 
 final permissionServiceProvider = Provider<PermissionService>((ref) {
