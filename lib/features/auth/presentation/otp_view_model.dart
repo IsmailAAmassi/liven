@@ -7,6 +7,7 @@ import '../../../core/config/app_providers.dart';
 import '../../../core/router/app_router.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../main/presentation/main_screen.dart';
+import '../../profile/application/profile_completion_guard.dart';
 import '../../profile/presentation/complete_profile_screen.dart';
 import '../data/auth_repository.dart';
 import '../domain/models/forgot_password_result.dart';
@@ -100,15 +101,21 @@ class OtpViewModel extends StateNotifier<OtpState> {
       return;
     }
     state = OtpState(phone: result.phone ?? state.phone);
-    final router = _ref.read(appRouterProvider);
     if (_args.flowType == OtpFlow.register) {
       await _ref.read(authStatusProvider.notifier).setStatus(AuthStatus.authenticated);
-      if (result.profileCompleted == true) {
-        router.go(MainScreen.routePath);
-      } else {
+      final guard = _ref.read(profileCompletionGuardProvider);
+      final router = _ref.read(appRouterProvider);
+      final shouldShow = await guard.shouldShowCompletion(
+        profileCompleted: result.profileCompleted == true,
+      );
+      if (shouldShow) {
+        await guard.markPrompted();
         router.go(CompleteProfileScreen.routePath);
+      } else {
+        router.go(MainScreen.routePath);
       }
     } else {
+      final router = _ref.read(appRouterProvider);
       await _repository.clearAuth();
       await _ref.read(authStatusProvider.notifier).setStatus(AuthStatus.loggedOut);
       router.go(

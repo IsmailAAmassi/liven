@@ -8,6 +8,8 @@ import '../../../l10n/app_localizations.dart';
 import '../../auth/presentation/login_screen.dart';
 import '../../main/presentation/main_screen.dart';
 import '../../onboarding/presentation/onboarding_screen.dart';
+import '../../profile/application/profile_completion_guard.dart';
+import '../../profile/presentation/complete_profile_screen.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -44,12 +46,26 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     final router = ref.read(appRouterProvider);
     final onboardingCompleted = ref.read(onboardingCompletedProvider);
     final authStatus = ref.read(authStatusProvider);
+    final guard = ref.read(profileCompletionGuardProvider);
+    final profileCompleted =
+        await ref.read(authStorageProvider).getProfileCompleted() ?? true;
 
     if (!onboardingCompleted) {
       router.go(OnboardingScreen.routePath);
     } else if (authStatus == AuthStatus.authenticated ||
         authStatus == AuthStatus.guest) {
-      router.go(MainScreen.routePath);
+      if (authStatus == AuthStatus.authenticated) {
+        final shouldShow =
+            await guard.shouldShowCompletion(profileCompleted: profileCompleted);
+        if (shouldShow) {
+          await guard.markPrompted();
+          router.go(CompleteProfileScreen.routePath);
+        } else {
+          router.go(MainScreen.routePath);
+        }
+      } else {
+        router.go(MainScreen.routePath);
+      }
     } else {
       router.go(LoginScreen.routePath);
     }

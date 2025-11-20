@@ -198,8 +198,42 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get completeProfileTitle => 'أكمل ملفك الشخصي';
   @override
-  String get completeProfilePlaceholder =>
-      'أضف بياناتك للمتابعة. قادم قريبًا.';
+  String get completeProfileDescription => 'أضف عمرك وجنسك وطولك ووزنك للمتابعة.';
+  @override
+  String get completeProfilePlaceholder => 'أضف بياناتك للمتابعة.';
+  @override
+  String get completeProfileRequiredNotice =>
+      'للمتابعة، يرجى إكمال ملفك الشخصي.';
+  @override
+  String get completeProfileSuccess => 'تم إكمال الملف الشخصي بنجاح.';
+  @override
+  String get completeProfileError => 'تعذر إكمال الملف الشخصي. حاول مرة أخرى.';
+  @override
+  String get completeProfileSaveButton => 'حفظ';
+  @override
+  String get completeProfileSkipButton => 'تخطي الآن';
+  @override
+  String get ageLabel => 'العمر';
+  @override
+  String get genderLabel => 'الجنس';
+  @override
+  String get lengthLabel => 'الطول (سم)';
+  @override
+  String get weightLabel => 'الوزن (كجم)';
+  @override
+  String get ageRequiredError => 'العمر مطلوب.';
+  @override
+  String get ageInvalidError => 'أدخل عمرًا صحيحًا بين 10 و100.';
+  @override
+  String get genderRequiredError => 'الجنس مطلوب.';
+  @override
+  String get lengthRequiredError => 'الطول مطلوب.';
+  @override
+  String get lengthInvalidError => 'أدخل طولًا صحيحًا بين 100 و250 سم.';
+  @override
+  String get weightRequiredError => 'الوزن مطلوب.';
+  @override
+  String get weightInvalidError => 'أدخل وزنًا صحيحًا بين 20 و300 كجم.';
   @override
   String get fieldPhone => 'رقم الجوال';
   @override

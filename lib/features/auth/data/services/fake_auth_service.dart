@@ -4,6 +4,7 @@ import '../../../../core/utils/unit.dart';
 import '../../domain/models/auth_result.dart';
 import '../../domain/models/auth_session.dart';
 import '../../domain/models/forgot_password_result.dart';
+import '../../domain/models/complete_profile_result.dart';
 import '../../domain/models/otp_send_result.dart';
 import '../../domain/models/otp_verify_result.dart';
 import '../../domain/models/register_result.dart';
@@ -155,6 +156,28 @@ class FakeAuthService implements AuthRepository {
   @override
   Future<void> clearAuth() {
     return _storage.clear();
+  }
+
+  @override
+  Future<CompleteProfileResult> completeProfile({
+    required int age,
+    required String gender,
+    required int length,
+    required int weight,
+  }) async {
+    await Future.delayed(const Duration(milliseconds: 600));
+    final session = AuthSession(
+      token: _token,
+      userId: 1,
+      profileCompleted: true,
+    );
+    await _persistSession(session);
+    return const CompleteProfileResult.success(
+      message: 'Profile completed',
+      userId: 1,
+      token: _token,
+      phone: '0123456789',
+    );
   }
 
   Future<void> _persistSession(AuthSession session) async {

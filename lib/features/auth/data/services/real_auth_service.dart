@@ -10,6 +10,7 @@ import '../../domain/entities/user.dart';
 import '../../domain/models/auth_result.dart';
 import '../../domain/models/auth_session.dart';
 import '../../domain/models/forgot_password_result.dart';
+import '../../domain/models/complete_profile_result.dart';
 import '../../domain/models/otp_send_result.dart';
 import '../../domain/models/otp_verify_result.dart';
 import '../../domain/models/register_result.dart';
@@ -319,6 +320,78 @@ class RealAuthService implements AuthRepository {
   }
 
   @override
+  Future<CompleteProfileResult> completeProfile({
+    required int age,
+    required String gender,
+    required int length,
+    required int weight,
+  }) async {
+    try {
+      final response = await _apiClient.post(_completeProfilePath, body: {
+        'age': age,
+        'gender': gender,
+        'length': length,
+        'weight': weight,
+      });
+
+      if (response.isSuccessful) {
+        final payload = _parsePayload(response.data);
+        final status = payload['status'] == true;
+        if (status) {
+          final data = _parseData(payload);
+          final token = _parseToken(payload);
+          final userId = _parseId(payload, data: data);
+          final storedPhone = await _storage.getUserPhone() ?? '';
+          final phone = _parsePhone(data, fallback: storedPhone);
+
+          await _storage.saveAuthToken(token);
+          await _storage.saveUserId(userId);
+          if (phone.isNotEmpty) {
+            await _storage.saveUserPhone(phone);
+          }
+          await _storage.saveProfileCompleted(true);
+
+          return CompleteProfileResult.success(
+            message: payload['message'] as String?,
+            userId: userId,
+            token: token,
+            phone: phone.isEmpty ? null : phone,
+          );
+        }
+        final errors = _parseErrors(response.data);
+        return CompleteProfileResult.failure(
+          message: payload['message'] as String?,
+          errors: errors,
+          fieldErrors: _mapFieldErrors(errors),
+          messageKey: 'error_validation',
+        );
+      }
+
+      if (response.statusCode == 422) {
+        final errors = _parseErrors(response.data);
+        return CompleteProfileResult.failure(
+          message: _extractMessage(response.data),
+          errors: errors,
+          messageKey: 'error_validation',
+          fieldErrors: _mapFieldErrors(errors),
+        );
+      }
+
+      final failure = _errorMapper.map(response.statusCode, response.data);
+      return CompleteProfileResult.failure(
+        message: failure.details?['message'] as String?,
+        messageKey: failure.messageKey,
+      );
+    } on SocketException catch (_) {
+      return const CompleteProfileResult.failure(messageKey: 'error_network');
+    } on TimeoutException catch (_) {
+      return const CompleteProfileResult.failure(messageKey: 'error_network');
+    } catch (_) {
+      return const CompleteProfileResult.failure(messageKey: 'error_unknown');
+    }
+  }
+
+  @override
   Future<User?> getCurrentUser() {
     return _storage.getUser();
   }
@@ -376,8 +449,31 @@ class RealAuthService implements AuthRepository {
     return <String, dynamic>{};
   }
 
+  Map<String, dynamic> _parseData(Map<String, dynamic> payload) {
+    final raw = payload['data'];
+    if (raw is Map<String, dynamic>) {
+      return raw;
+    }
+    return <String, dynamic>{};
+  }
+
+  String _parseToken(Map<String, dynamic> payload) {
+    final token = payload['token']?.toString();
+    final tempToken = payload['temp_token']?.toString();
+    if (token != null && token.isNotEmpty) {
+      return token;
+    }
+    return tempToken ?? '';
+  }
+
   String _parsePhone(dynamic data, {String fallback = ''}) {
-    var phone = data?.toString() ?? '';
+    String phone;
+    if (data is Map<String, dynamic>) {
+      final value = data['phone'] ?? data['tel'] ?? data['mobile'];
+      phone = value?.toString() ?? '';
+    } else {
+      phone = data?.toString() ?? '';
+    }
     if (phone.isEmpty) {
       phone = fallback;
     }
@@ -405,12 +501,34 @@ class RealAuthService implements AuthRepository {
     return <String, dynamic>{};
   }
 
-  int _parseId(Map<String, dynamic> payload, {User? fallbackUser}) {
-    final rawId = payload['id'] ?? payload['user_id'] ?? fallbackUser?.id;
+  int _parseId(
+    Map<String, dynamic> payload, {
+    User? fallbackUser,
+    Map<String, dynamic>? data,
+  }) {
+    final rawId =
+        data?['id'] ?? payload['id'] ?? payload['user_id'] ?? fallbackUser?.id;
     if (rawId is int) {
       return rawId;
     }
     return int.tryParse(rawId?.toString() ?? '') ?? 0;
+  }
+
+  Map<String, String> _mapFieldErrors(List<String> errors) {
+    final fieldErrors = <String, String>{};
+    for (final error in errors) {
+      final normalized = error.toLowerCase();
+      if (normalized.contains('age')) {
+        fieldErrors['age'] = error;
+      } else if (normalized.contains('gender')) {
+        fieldErrors['gender'] = error;
+      } else if (normalized.contains('weight')) {
+        fieldErrors['weight'] = error;
+      } else if (normalized.contains('length') || normalized.contains('height')) {
+        fieldErrors['length'] = error;
+      }
+    }
+    return fieldErrors;
   }
 
   String _extractMessage(dynamic data) {
@@ -431,4 +549,5 @@ class RealAuthService implements AuthRepository {
   String get _forgotPasswordPath => '/mobile/forgot';
   String get _logoutPath => '/mobile/logout';
   String get _refreshPath => '/mobile/token/refresh';
+  String get _completeProfilePath => '/mobile/register/continue';
 }

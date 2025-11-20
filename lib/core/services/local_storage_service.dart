@@ -24,6 +24,8 @@ class LocalStorageService {
   static const _termsCacheKey = 'terms_cache';
   static const _settingsCacheUpdatedAtKey = 'settings_cache_updated_at';
   static const _termsCacheUpdatedAtKey = 'terms_cache_updated_at';
+  static const _completeProfileLastPromptKey =
+      'complete_profile_last_prompt_at';
 
   Future<void> setOnboardingCompleted(bool value) async {
     await _prefs.setBool(_onboardingKey, value);
@@ -141,5 +143,15 @@ class LocalStorageService {
 
   Future<bool> hasDismissedNotificationPrompt() async {
     return _prefs.getBool(_notificationPromptDismissedKey) ?? false;
+  }
+
+  Future<void> setCompleteProfilePromptedAt(DateTime value) async {
+    await _prefs.setString(_completeProfileLastPromptKey, value.toIso8601String());
+  }
+
+  Future<DateTime?> getCompleteProfilePromptedAt() async {
+    final value = _prefs.getString(_completeProfileLastPromptKey);
+    if (value == null) return null;
+    return DateTime.tryParse(value);
   }
 }

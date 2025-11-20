@@ -6,6 +6,7 @@ import '../models/otp_verify_result.dart';
 import '../models/register_result.dart';
 import '../models/forgot_password_result.dart';
 import '../models/reset_password_result.dart';
+import '../models/complete_profile_result.dart';
 
 abstract interface class AuthRepository {
   Future<AuthResult> login({
@@ -42,4 +43,11 @@ abstract interface class AuthRepository {
   Future<User?> getCurrentUser();
 
   Future<void> clearAuth();
+
+  Future<CompleteProfileResult> completeProfile({
+    required int age,
+    required String gender,
+    required int length,
+    required int weight,
+  });
 }
