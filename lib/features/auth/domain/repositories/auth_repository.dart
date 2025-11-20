@@ -4,6 +4,8 @@ import '../models/auth_result.dart';
 import '../models/otp_send_result.dart';
 import '../models/otp_verify_result.dart';
 import '../models/register_result.dart';
+import '../models/forgot_password_result.dart';
+import '../models/reset_password_result.dart';
 
 abstract interface class AuthRepository {
   Future<AuthResult> login({
@@ -18,7 +20,7 @@ abstract interface class AuthRepository {
     required String name,
   });
 
-  Future<EmptyResult> requestPasswordReset(String identifier);
+  Future<ForgotPasswordResult> forgotPassword({required String phone});
 
   Future<OtpVerifyResult> verifyOtp({
     required String phone,
@@ -27,9 +29,10 @@ abstract interface class AuthRepository {
 
   Future<OtpSendResult> sendOtp({required String phone});
 
-  Future<EmptyResult> resetPassword({
-    required String identifier,
+  Future<ResetPasswordResult> resetPassword({
+    required String phone,
     required String password,
+    required String passwordConfirmation,
   });
 
   Future<EmptyResult> logout();

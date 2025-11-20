@@ -8,7 +8,9 @@ import '../../../l10n/app_localizations.dart';
 import '../../main/presentation/main_screen.dart';
 import '../../profile/presentation/complete_profile_screen.dart';
 import '../domain/models/auth_session.dart';
+import '../domain/models/forgot_password_result.dart';
 import '../domain/models/register_result.dart';
+import '../domain/models/reset_password_result.dart';
 import '../data/auth_repository.dart';
 import 'login_screen.dart';
 import 'otp_screen.dart';
@@ -18,32 +20,40 @@ class AuthState {
   const AuthState({
     this.isLoading = false,
     this.errorMessage,
+    this.successMessage,
   });
 
   final bool isLoading;
   final String? errorMessage;
+  final String? successMessage;
 
-  AuthState copyWith({bool? isLoading, String? errorMessage}) {
+  AuthState copyWith({bool? isLoading, String? errorMessage, String? successMessage}) {
     return AuthState(
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage ?? this.errorMessage,
+      successMessage: successMessage ?? this.successMessage,
     );
   }
 }
 
-enum OtpFlowType { register, forgotPassword }
+enum OtpFlow { register, forgotPassword }
 
 class OtpScreenArgs {
-  const OtpScreenArgs({required this.flowType, required this.identifier});
+  const OtpScreenArgs({
+    required this.flowType,
+    required this.phone,
+    this.initialMessage,
+  });
 
-  final OtpFlowType flowType;
-  final String identifier;
+  final OtpFlow flowType;
+  final String phone;
+  final String? initialMessage;
 }
 
 class ResetPasswordArgs {
-  const ResetPasswordArgs({required this.identifier});
+  const ResetPasswordArgs({required this.phone});
 
-  final String identifier;
+  final String phone;
 }
 
 final authViewModelProvider = StateNotifierProvider<AuthViewModel, AuthState>((ref) {
@@ -95,6 +105,7 @@ class AuthViewModel extends StateNotifier<AuthState> {
     required String password,
   }) async {
     state = const AuthState(isLoading: true);
+    final l10n = _currentL10n;
     final result = await _repository.register(
       phone: phone,
       password: password,
@@ -108,14 +119,19 @@ class AuthViewModel extends StateNotifier<AuthState> {
     state = const AuthState();
     _ref.read(appRouterProvider).go(
       OtpScreen.routePath,
-      extra: OtpScreenArgs(flowType: OtpFlowType.register, identifier: phone),
+      extra: OtpScreenArgs(
+        flowType: OtpFlow.register,
+        phone: phone,
+        initialMessage: l10n.otpSentMessage,
+      ),
     );
   }
 
-  Future<void> requestPasswordReset(String identifier) async {
+  Future<void> requestPasswordReset(String phone) async {
     state = const AuthState(isLoading: true);
-    final result = await _repository.requestPasswordReset(identifier);
-    final errorMessage = _errorFromResult(result);
+    final l10n = _currentL10n;
+    final result = await _repository.forgotPassword(phone: phone);
+    final errorMessage = _mapForgotPasswordError(result);
     if (errorMessage != null) {
       state = state.copyWith(isLoading: false, errorMessage: errorMessage);
       return;
@@ -123,24 +139,32 @@ class AuthViewModel extends StateNotifier<AuthState> {
     state = const AuthState();
     _ref.read(appRouterProvider).go(
       OtpScreen.routePath,
-      extra: OtpScreenArgs(flowType: OtpFlowType.forgotPassword, identifier: identifier),
+      extra: OtpScreenArgs(
+        flowType: OtpFlow.forgotPassword,
+        phone: phone,
+        initialMessage: result.message ?? l10n.otpSentMessage,
+      ),
     );
   }
 
   Future<void> resetPassword({
-    required String identifier,
+    required String phone,
     required String password,
+    required String passwordConfirmation,
   }) async {
     state = const AuthState(isLoading: true);
-    final result = await _repository.resetPassword(identifier: identifier, password: password);
-    final errorMessage = _errorFromResult(result);
+    final result = await _repository.resetPassword(
+      phone: phone,
+      password: password,
+      passwordConfirmation: passwordConfirmation,
+    );
+    final errorMessage = _mapResetPasswordError(result);
     if (errorMessage != null) {
       state = state.copyWith(isLoading: false, errorMessage: errorMessage);
       return;
     }
     await _ref.read(authStatusProvider.notifier).setStatus(AuthStatus.loggedOut);
-    state = const AuthState();
-    _ref.read(appRouterProvider).go(LoginScreen.routePath);
+    state = AuthState(successMessage: result.message ?? _currentL10n.resetPasswordSuccessMessage);
   }
 
   Future<void> logout() async {
@@ -183,6 +207,8 @@ class AuthViewModel extends StateNotifier<AuthState> {
         return l10n.errorIncorrectOtp;
       case 'error_network':
         return l10n.errorNetwork;
+      case 'validationPhoneRequired':
+        return l10n.validationPhone;
       case 'error_bad_request':
         return l10n.error_bad_request;
       case 'error_unauthorized':
@@ -228,5 +254,40 @@ class AuthViewModel extends StateNotifier<AuthState> {
       return l10n.authErrorPasswordTooShort;
     }
     return error;
+  }
+
+  String? _mapForgotPasswordError(ForgotPasswordResult result) {
+    if (result.success) return null;
+    final l10n = _currentL10n;
+    if (result.hasErrors) {
+      return result.errors!.join('\n');
+    }
+    if (result.message != null && result.message!.isNotEmpty) {
+      return result.message;
+    }
+    if (result.messageKey != null) {
+      return _mapFailure(ApiFailure(messageKey: result.messageKey));
+    }
+    return l10n.otpGenericError;
+  }
+
+  String? _mapResetPasswordError(ResetPasswordResult result) {
+    if (result.success) return null;
+    final l10n = _currentL10n;
+    if (result.hasErrors) {
+      return result.errors!.join('\n');
+    }
+    if (result.message != null && result.message!.isNotEmpty) {
+      return result.message;
+    }
+    if (result.messageKey != null) {
+      return _mapFailure(ApiFailure(messageKey: result.messageKey));
+    }
+    return l10n.errorGeneric;
+  }
+
+  AppLocalizations get _currentL10n {
+    final locale = _ref.read(localeProvider);
+    return lookupAppLocalizations(locale);
   }
 }

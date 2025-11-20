@@ -4,8 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/app_text_field.dart';
+import '../../../core/router/app_router.dart';
 import '../../../l10n/app_localizations.dart';
 import 'auth_view_model.dart';
+import 'login_screen.dart';
 
 class ResetPasswordScreen extends ConsumerStatefulWidget {
   const ResetPasswordScreen({super.key, required this.args});
@@ -25,6 +27,20 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
   final _confirmController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    ref.listen<AuthState>(authViewModelProvider, (previous, next) {
+      if (next.successMessage != null && next.successMessage != previous?.successMessage) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(next.successMessage!)),
+        );
+        ref.read(appRouterProvider).go(LoginScreen.routePath);
+      }
+    });
+  }
+
+  @override
   void dispose() {
     _passwordController.dispose();
     _confirmController.dispose();
@@ -34,9 +50,10 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
   void _submit() {
     if (_formKey.currentState?.validate() ?? false) {
       ref.read(authViewModelProvider.notifier).resetPassword(
-            identifier: widget.args.identifier,
-            password: _passwordController.text.trim(),
-          );
+        phone: widget.args.phone,
+        password: _passwordController.text.trim(),
+        passwordConfirmation: _confirmController.text.trim(),
+      );
     }
   }
 

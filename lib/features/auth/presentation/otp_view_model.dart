@@ -9,6 +9,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../main/presentation/main_screen.dart';
 import '../../profile/presentation/complete_profile_screen.dart';
 import '../data/auth_repository.dart';
+import '../domain/models/forgot_password_result.dart';
 import '../domain/models/otp_send_result.dart';
 import '../domain/models/otp_verify_result.dart';
 import 'auth_view_model.dart';
@@ -16,6 +17,7 @@ import 'reset_password_screen.dart';
 
 class OtpState {
   const OtpState({
+    required this.phone,
     this.isVerifying = false,
     this.isResending = false,
     this.errorMessage,
@@ -23,6 +25,7 @@ class OtpState {
     this.secondsRemaining = 0,
   });
 
+  final String phone;
   final bool isVerifying;
   final bool isResending;
   final String? errorMessage;
@@ -32,6 +35,7 @@ class OtpState {
   bool get canResend => !isResending && secondsRemaining == 0;
 
   OtpState copyWith({
+    String? phone,
     bool? isVerifying,
     bool? isResending,
     Object? errorMessage = _messageSentinel,
@@ -39,6 +43,7 @@ class OtpState {
     int? secondsRemaining,
   }) {
     return OtpState(
+      phone: phone ?? this.phone,
       isVerifying: isVerifying ?? this.isVerifying,
       isResending: isResending ?? this.isResending,
       errorMessage:
@@ -52,14 +57,24 @@ class OtpState {
 
 const _messageSentinel = Object();
 
-final otpViewModelProvider =
-    StateNotifierProvider.autoDispose.family<OtpViewModel, OtpState, OtpScreenArgs>((ref, args) {
+final otpViewModelProvider = StateNotifierProvider.autoDispose.family<OtpViewModel, OtpState, OtpScreenArgs>((ref, args) {
   final repository = ref.watch(authRepositoryProvider);
   return OtpViewModel(ref, repository, args);
 });
 
 class OtpViewModel extends StateNotifier<OtpState> {
-  OtpViewModel(this._ref, this._repository, this._args) : super(const OtpState());
+  OtpViewModel(this._ref, this._repository, this._args)
+      : super(
+          OtpState(
+            phone: _args.phone,
+            successMessage: _args.initialMessage,
+            secondsRemaining: _args.initialMessage != null ? 60 : 0,
+          ),
+        ) {
+    if (state.secondsRemaining > 0) {
+      _startCountdown();
+    }
+  }
 
   final Ref _ref;
   final AuthRepository _repository;
@@ -78,15 +93,15 @@ class OtpViewModel extends StateNotifier<OtpState> {
       return;
     }
     state = state.copyWith(isVerifying: true, errorMessage: null, successMessage: null);
-    final result = await _repository.verifyOtp(phone: _args.identifier, otpCode: code);
+    final result = await _repository.verifyOtp(phone: state.phone, otpCode: code);
     if (!result.success) {
       final message = _mapVerifyFailure(result);
       state = state.copyWith(isVerifying: false, errorMessage: message);
       return;
     }
-    state = const OtpState();
+    state = OtpState(phone: result.phone ?? state.phone);
     final router = _ref.read(appRouterProvider);
-    if (_args.flowType == OtpFlowType.register) {
+    if (_args.flowType == OtpFlow.register) {
       await _ref.read(authStatusProvider.notifier).setStatus(AuthStatus.authenticated);
       if (result.profileCompleted == true) {
         router.go(MainScreen.routePath);
@@ -94,9 +109,11 @@ class OtpViewModel extends StateNotifier<OtpState> {
         router.go(CompleteProfileScreen.routePath);
       }
     } else {
+      await _repository.clearAuth();
+      await _ref.read(authStatusProvider.notifier).setStatus(AuthStatus.loggedOut);
       router.go(
         ResetPasswordScreen.routePath,
-        extra: ResetPasswordArgs(identifier: _args.identifier),
+        extra: ResetPasswordArgs(phone: state.phone),
       );
     }
   }
@@ -104,7 +121,22 @@ class OtpViewModel extends StateNotifier<OtpState> {
   Future<void> resendOtp() async {
     if (!state.canResend) return;
     state = state.copyWith(isResending: true, errorMessage: null, successMessage: null);
-    final result = await _repository.sendOtp(phone: _args.identifier);
+    if (_args.flowType == OtpFlow.forgotPassword && state.phone != _args.phone) {
+      final result = await _repository.forgotPassword(phone: state.phone);
+      if (!result.success) {
+        final message = _mapForgotFailure(result);
+        state = state.copyWith(isResending: false, errorMessage: message);
+        return;
+      }
+      state = state.copyWith(
+        isResending: false,
+        successMessage: result.message ?? _l10n.otpSentMessage,
+        secondsRemaining: 60,
+      );
+      _startCountdown();
+      return;
+    }
+    final result = await _repository.sendOtp(phone: state.phone);
     if (!result.success) {
       final message = _mapSendFailure(result);
       state = state.copyWith(isResending: false, errorMessage: message);
@@ -116,6 +148,10 @@ class OtpViewModel extends StateNotifier<OtpState> {
       secondsRemaining: 60,
     );
     _startCountdown();
+  }
+
+  void updatePhone(String phone) {
+    state = state.copyWith(phone: phone, errorMessage: null);
   }
 
   void _startCountdown() {
@@ -150,6 +186,16 @@ class OtpViewModel extends StateNotifier<OtpState> {
     return _messageFromKey(result.messageKey) ?? _l10n.otpGenericError;
   }
 
+  String _mapForgotFailure(ForgotPasswordResult result) {
+    if (result.hasErrors) {
+      return result.errors!.join('\n');
+    }
+    if (result.message != null && result.message!.isNotEmpty) {
+      return result.message!;
+    }
+    return _messageFromKey(result.messageKey) ?? _l10n.otpGenericError;
+  }
+
   String? _messageFromKey(String? key) {
     switch (key) {
       case 'otp_invalid':
@@ -162,6 +208,10 @@ class OtpViewModel extends StateNotifier<OtpState> {
         return _l10n.otpGenericError;
       case 'error_network':
         return _l10n.errorNetwork;
+      case 'error_validation':
+        return _l10n.error_validation;
+      case 'validationPhoneRequired':
+        return _l10n.validationPhone;
       default:
         return null;
     }

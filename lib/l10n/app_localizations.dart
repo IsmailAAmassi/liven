@@ -160,6 +160,7 @@ abstract class AppLocalizations {
   String otpResendInXSeconds(int seconds);
   String get verifyButton;
   String get resetPasswordAppBar;
+  String get resetPasswordSuccessMessage;
   String get resetPasswordButton;
   String get termsTitle;
   String get termsParagraphOne;

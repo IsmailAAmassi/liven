@@ -9,9 +9,11 @@ import '../../../../core/utils/unit.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/models/auth_result.dart';
 import '../../domain/models/auth_session.dart';
+import '../../domain/models/forgot_password_result.dart';
 import '../../domain/models/otp_send_result.dart';
 import '../../domain/models/otp_verify_result.dart';
 import '../../domain/models/register_result.dart';
+import '../../domain/models/reset_password_result.dart';
 import '../../domain/repositories/auth_repository.dart';
 
 class RealAuthService implements AuthRepository {
@@ -105,15 +107,6 @@ class RealAuthService implements AuthRepository {
     } catch (_) {
       return const RegisterResult.failure(messageKey: 'auth_register_failed');
     }
-  }
-
-  @override
-  Future<EmptyResult> requestPasswordReset(String identifier) async {
-    final response = await _apiClient.post(
-      _sendOtpPath,
-      body: _identifierPayload(identifier),
-    );
-    return _handleEmptyResult(response);
   }
 
   @override
@@ -222,14 +215,89 @@ class RealAuthService implements AuthRepository {
   }
 
   @override
-  Future<EmptyResult> resetPassword({
-    required String identifier,
+  Future<ForgotPasswordResult> forgotPassword({required String phone}) async {
+    try {
+      final response = await _apiClient.post(_forgotPasswordPath, body: {
+        'phone': phone,
+      });
+      if (response.isSuccessful) {
+        final payload = _parsePayload(response.data);
+        final status = payload['status'] == true;
+        if (status) {
+          return ForgotPasswordResult.success(message: payload['message'] as String?);
+        }
+        return ForgotPasswordResult.failure(
+          message: payload['message'] as String?,
+          errors: _parseErrors(response.data),
+          messageKey: 'otp_generic_error',
+        );
+      }
+      if (response.statusCode == 422 || response.statusCode == 400) {
+        final errors = _parseErrors(response.data);
+        return ForgotPasswordResult.failure(
+          message: _extractMessage(response.data),
+          errors: errors,
+          messageKey: errors.isNotEmpty ? 'error_validation' : 'otp_generic_error',
+        );
+      }
+      final failure = _errorMapper.map(response.statusCode, response.data);
+      return ForgotPasswordResult.failure(
+        message: failure.details?['message'] as String?,
+        messageKey: failure.messageKey,
+      );
+    } on SocketException catch (_) {
+      return const ForgotPasswordResult.failure(messageKey: 'error_network');
+    } on TimeoutException catch (_) {
+      return const ForgotPasswordResult.failure(messageKey: 'error_network');
+    } catch (_) {
+      return const ForgotPasswordResult.failure(messageKey: 'otp_generic_error');
+    }
+  }
+
+  @override
+  Future<ResetPasswordResult> resetPassword({
+    required String phone,
     required String password,
+    required String passwordConfirmation,
   }) async {
-    final payload = _identifierPayload(identifier)
-      ..['password'] = password;
-    final response = await _apiClient.post(_resetPasswordPath, body: payload);
-    return _handleEmptyResult(response);
+    try {
+      final response = await _apiClient.post(_resetPasswordPath, body: {
+        'phone': phone,
+        'password': password,
+        'password_confirmation': passwordConfirmation,
+      });
+      if (response.isSuccessful) {
+        final payload = _parsePayload(response.data);
+        final status = payload['status'] == true;
+        if (status) {
+          return ResetPasswordResult.success(message: payload['message'] as String?);
+        }
+        return ResetPasswordResult.failure(
+          message: payload['message'] as String?,
+          errors: _parseErrors(response.data),
+          messageKey: 'error_validation',
+        );
+      }
+      if (response.statusCode == 422 || response.statusCode == 400) {
+        final errors = _parseErrors(response.data);
+        return ResetPasswordResult.failure(
+          message: _extractMessage(response.data),
+          errors: errors,
+          messageKey: 'error_validation',
+        );
+      }
+      final failure = _errorMapper.map(response.statusCode, response.data);
+      return ResetPasswordResult.failure(
+        message: failure.details?['message'] as String?,
+        messageKey: failure.messageKey,
+      );
+    } on SocketException catch (_) {
+      return const ResetPasswordResult.failure(messageKey: 'error_network');
+    } on TimeoutException catch (_) {
+      return const ResetPasswordResult.failure(messageKey: 'error_network');
+    } catch (_) {
+      return const ResetPasswordResult.failure(messageKey: 'error_unknown');
+    }
   }
 
   @override
@@ -337,18 +405,6 @@ class RealAuthService implements AuthRepository {
     return <String, dynamic>{};
   }
 
-  Map<String, dynamic> _identifierPayload(String identifier) {
-    final payload = <String, dynamic>{
-      'identifier': identifier,
-    };
-    if (identifier.contains('@')) {
-      payload['email'] = identifier;
-    } else {
-      payload['phone'] = identifier;
-    }
-    return payload;
-  }
-
   int _parseId(Map<String, dynamic> payload, {User? fallbackUser}) {
     final rawId = payload['id'] ?? payload['user_id'] ?? fallbackUser?.id;
     if (rawId is int) {
@@ -372,6 +428,7 @@ class RealAuthService implements AuthRepository {
   String get _sendOtpPath => '/mobile/user/otp/send';
   String get _verifyOtpPath => '/mobile/user/otp/verify';
   String get _resetPasswordPath => '/mobile/user/password/forget/update';
+  String get _forgotPasswordPath => '/mobile/forgot';
   String get _logoutPath => '/mobile/logout';
   String get _refreshPath => '/mobile/token/refresh';
 }

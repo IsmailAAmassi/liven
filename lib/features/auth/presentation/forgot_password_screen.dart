@@ -19,18 +19,18 @@ class ForgotPasswordScreen extends ConsumerStatefulWidget {
 
 class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _identifierController = TextEditingController();
+  final _phoneController = TextEditingController();
 
   @override
   void dispose() {
-    _identifierController.dispose();
+    _phoneController.dispose();
     super.dispose();
   }
 
   void _submit() {
     if (_formKey.currentState?.validate() ?? false) {
       ref.read(authViewModelProvider.notifier).requestPasswordReset(
-            _identifierController.text.trim(),
+            _phoneController.text.trim(),
           );
     }
   }
@@ -67,7 +67,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                 const SizedBox(height: 24),
                 AppTextField(
                   label: l10n.fieldPhone,
-                  controller: _identifierController,
+                  controller: _phoneController,
+                  keyboardType: TextInputType.phone,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return l10n.validationPhone;
