@@ -57,7 +57,9 @@ class _AppWebViewState extends ConsumerState<AppWebView> {
               _isLoading = false;
               _lastError = error;
             });
-            debugPrint('WebView error (${_currentRequest?.uri}): ${error.description}');
+            debugPrint(
+              'WebView error (${_currentRequest?.uri}): ${error.description}',
+            );
           },
         ),
       );
@@ -68,7 +70,8 @@ class _AppWebViewState extends ConsumerState<AppWebView> {
     if (previous == null) {
       return false;
     }
-    return previous.uri == request.uri && mapEquals(previous.headers, request.headers);
+    return previous.uri == request.uri &&
+        mapEquals(previous.headers, request.headers);
   }
 
   void _loadRequest(TabWebRequest request) {
@@ -121,51 +124,61 @@ class _AppWebViewState extends ConsumerState<AppWebView> {
           edgeOffset: 8,
           child: LayoutBuilder(
             builder: (context, constraints) {
-              return SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(parent: ClampingScrollPhysics()),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                  child: requestAsync.when(
-                    data: (request) {
-                      _loadRequest(request);
-                      return Stack(
-                        children: [
-                          Positioned.fill(
-                            child: ColoredBox(
-                              color: Theme.of(context).colorScheme.surface,
-                              child: WebViewWidget(controller: _controller),
-                            ),
-                          ),
-                          if (_lastError != null)
-                            Positioned.fill(
-                              child: _WebViewErrorView(
-                                message: l10n.webviewErrorInlineMessage,
-                                hint: l10n.webviewPullToRefreshHint,
+              return CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(
+                  parent: ClampingScrollPhysics(),
+                ),
+                slivers: [
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints.tightFor(
+                        width: constraints.maxWidth,
+                        height: constraints.maxHeight,
+                      ),
+                      child: requestAsync.when(
+                        data: (request) {
+                          _loadRequest(request);
+                          return Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              ColoredBox(
+                                color: Theme.of(context).colorScheme.surface,
+                                child: WebViewWidget(controller: _controller),
                               ),
-                            ),
-                          Positioned(
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            child: AnimatedOpacity(
-                              opacity: _isLoading ? 1 : 0,
-                              duration: const Duration(milliseconds: 200),
-                              child: LinearProgressIndicator(
-                                value: _progress > 0 && _progress < 1 ? _progress : null,
-                                minHeight: 3,
+                              if (_lastError != null)
+                                _WebViewErrorView(
+                                  message: l10n.webviewErrorInlineMessage,
+                                  hint: l10n.webviewPullToRefreshHint,
+                                ),
+                              Positioned(
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                child: AnimatedOpacity(
+                                  opacity: _isLoading ? 1 : 0,
+                                  duration: const Duration(milliseconds: 200),
+                                  child: LinearProgressIndicator(
+                                    value: _progress > 0 && _progress < 1
+                                        ? _progress
+                                        : null,
+                                    minHeight: 3,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                    loading: () => const Center(child: CircularProgressIndicator()),
-                    error: (error, stackTrace) => _WebViewErrorView(
-                      message: l10n.webviewSettingsError,
-                      hint: l10n.webviewPullToRefreshHint,
+                            ],
+                          );
+                        },
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
+                        error: (error, stackTrace) => _WebViewErrorView(
+                          message: l10n.webviewSettingsError,
+                          hint: l10n.webviewPullToRefreshHint,
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                ],
               );
             },
           ),
@@ -176,10 +189,7 @@ class _AppWebViewState extends ConsumerState<AppWebView> {
 }
 
 class _WebViewErrorView extends StatelessWidget {
-  const _WebViewErrorView({
-    required this.message,
-    required this.hint,
-  });
+  const _WebViewErrorView({required this.message, required this.hint});
 
   final String message;
   final String hint;

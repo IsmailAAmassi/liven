@@ -237,7 +237,7 @@ class AuthViewModel extends StateNotifier<AuthState> {
       return mappedErrors.join('\n');
     }
     if (result.messageKey != null) {
-      return _mapFailure(ApiFailure(messageKey: result.messageKey));
+      return _mapFailure(ApiFailure(messageKey: result.messageKey!));
     }
     if (result.message != null && result.message!.isNotEmpty) {
       return result.message;

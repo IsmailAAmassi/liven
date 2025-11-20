@@ -1,3 +1,5 @@
+import 'package:liven/features/auth/domain/entities/user.dart';
+
 import '../../../../core/network/api_result.dart';
 import '../../../../core/services/auth_storage.dart';
 import '../../../../core/utils/unit.dart';

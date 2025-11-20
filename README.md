@@ -1,45 +1,172 @@
-# Liven
+````text
+You are a senior Flutter architect.
 
-Production-ready Flutter starter focused on multilingual onboarding, Riverpod state management, and modular feature layers.
+Your task is to START IMPLEMENTING the REAL AUTH ENDPOINTS, beginning with **login**, following the existing project patterns:
+- Fake vs Real services
+- Repository interface abstraction
+- Riverpod state management
+- AR/EN localization
+- Clean navigation structure
+- Local storage for token + userId
 
-## Requirements
+====================================================
+1. LOGIN ENDPOINT DETAILS
+====================================================
 
-- Flutter 3.8 or newer
-- Dart 3.8 or newer
-- Xcode 15+ for iOS builds
-- Android Studio / Android SDK 34+
+**Endpoint:**  
+POST `mobile/login`
 
-## Getting Started
+**Request body:**  
+- phone (String) — e.g. "0592182025"  
+- password (String) — e.g. "12345678"  
+- fcm_token (String? optional)
 
-```bash
-flutter pub get
-flutter run
+**Successful response (HTTP 200):**
+```json
+{
+    "token": "JWT_TOKEN_HERE",
+    "payment": {
+        "type1": "https://payment.liven-sa.com/type1.php?user_id=616",
+        "type2": "https://payment.liven-sa.com/type2.php?user_id=616"
+    },
+    "id": 616,
+    "profile_completed": false,
+    "status": true
+}
+
+
+From this response we only need to **save**:
+
+* `token`
+* `id`
+
+And use `profile_completed` to decide navigation:
+
+* If `false` → go to **CompleteProfileScreen** (empty placeholder for now)
+* If `true` → go to **MainScreen**
+
+**Error response (HTTP 422):**
+
+```json
+{
+    "message": "Password missmatch",
+    "status": false
+}
 ```
 
-The project ships with Riverpod, GoRouter, localization stubs, and custom UI components so you can start wiring real features immediately.
+This must show a **clear, localized AR/EN message** to the user.
 
-## Environment configuration
+====================================================
+2. ARCHITECTURE REQUIREMENTS
+   ============================
 
-Use the provided Dart define files under `env/` to toggle between fake and real auth implementations (or to change the API base URL).
-See [`docs/env.md`](docs/env.md) for the list of available files and detailed run/build commands with `--dart-define-from-file`.
+### Auth Repository Interface
 
-## Zoom Video SDK integration
+Update the existing `IAuthService` / `AuthRepository` with a new method:
 
-Zoom calling is available directly from the home tab through the official `flutter_zoom_videosdk` plugin. All runtime credentials are pulled from `--dart-define` values, so no secrets are committed to the repo. Review [`docs/zoom_setup.md`](docs/zoom_setup.md) for:
+* `Future<AuthResult> login({required String phone, required String password, String? fcmToken})`
 
-- Required environment variables (`ZOOM_SESSION_*` and `ZOOM_SDK_*`).
-- Android and iOS native configuration (permissions, Gradle repositories, plist keys).
-- How to generate secure session tokens on the backend.
-- Testing tips for the in-app "Join Zoom session" CTA.
+### RealAuthService
 
-## Localization
+Implement `login()` using the ApiClient:
 
-English and Arabic strings live inside `lib/l10n`. Run `flutter gen-l10n` to regenerate strongly typed accessors after editing the `.arb` files.
+* POST to `mobile/login`
+* Send JSON body with phone, password, fcm_token
+* On success:
 
-## Testing
+    * Parse `token`, `id`, `profile_completed`
+    * Save token + id using AuthStorage
+    * Return `AuthResult.success(...)`
+* On failure:
 
-```bash
-flutter test
-```
+    * For HTTP 422:
 
-(Use `flutter test --coverage` to produce coverage reports.)
+        * Use server message (localized fallback)
+    * For 400, 401, 500, timeouts:
+
+        * Return properly mapped ApiFailure → localized message
+
+### FakeAuthService
+
+* Update to match the new interface.
+* Return mocked token, id, profileCompleted values.
+
+### Env-based Switching
+
+Use existing flag `USE_FAKE_AUTH=true|false` to choose Fake or Real implementation through a provider.
+
+====================================================
+3. LOCAL STORAGE
+   ================
+
+Update AuthStorage / LocalStorageService:
+
+* `saveAuthToken(String token)`
+* `saveUserId(int id)`
+* `getAuthToken()`
+* `getUserId()`
+
+Ensure token & id are stored **before** navigating after login.
+
+====================================================
+4. UI & NAVIGATION
+   ==================
+
+Login ViewModel / Controller:
+
+1. Validate phone + password
+2. Call:
+   `authRepository.login(phone: phone, password: password, fcmToken: currentFcmToken)`
+3. On success:
+
+    * If `profile_completed == false` → navigate to **CompleteProfileScreen**
+    * If `profile_completed == true` → navigate to **MainScreen**
+4. On failure:
+
+    * Show AR/EN localized error message from result
+
+**CompleteProfileScreen**
+
+* Create a placeholder screen (empty content for now).
+* Should be ready for future logic.
+
+====================================================
+5. LOCALIZATION
+   ===============
+
+Add AR/EN keys for:
+
+* Incorrect credentials (422)
+* Generic login error
+* Network/server error messages
+
+Example keys:
+
+* `auth_login_failed`
+* `auth_invalid_credentials`
+* `error_network`
+* `error_server`
+
+====================================================
+6. OUTPUT REQUIREMENTS
+   ======================
+
+Provide fully working Dart code for:
+
+1. Updated AuthRepository / IAuthService interface
+2. RealAuthService login implementation
+3. Updated FakeAuthService
+4. AuthStorage updates (save/get token + userId)
+5. Login ViewModel / Controller with navigation logic
+6. Placeholder `CompleteProfileScreen`
+7. Suggested AR/EN translations in ARB format
+
+All code must:
+
+* Compile successfully
+* Follow existing architecture and patterns
+* Provide strong error handling
+* Use clean separation between network, storage, and UI
+* Support AR/EN localization
+
+````

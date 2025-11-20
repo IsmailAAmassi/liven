@@ -12,7 +12,7 @@ class AppConfig {
   );
 
   static final bool useFakeAuth = _parseBool(
-    const String.fromEnvironment('USE_FAKE_AUTH', defaultValue: 'true'),
+    const String.fromEnvironment('USE_FAKE_AUTH', defaultValue: 'false'),
   );
 
   static final bool useFakeSettings = _parseBool(
