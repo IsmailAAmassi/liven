@@ -6,23 +6,21 @@ import 'package:webview_flutter/webview_flutter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../providers/webview_request_providers.dart';
 
-class TabWebView extends ConsumerStatefulWidget {
-  const TabWebView({
+class AppWebView extends ConsumerStatefulWidget {
+  const AppWebView({
     super.key,
-    required this.title,
     required this.request,
     required this.onRequestRefresh,
   });
 
-  final String title;
   final AsyncValue<TabWebRequest> request;
-  final VoidCallback onRequestRefresh;
+  final Future<void> Function() onRequestRefresh;
 
   @override
-  ConsumerState<TabWebView> createState() => _TabWebViewState();
+  ConsumerState<AppWebView> createState() => _AppWebViewState();
 }
 
-class _TabWebViewState extends ConsumerState<TabWebView> {
+class _AppWebViewState extends ConsumerState<AppWebView> {
   late final WebViewController _controller;
   double _progress = 0;
   bool _isLoading = true;
@@ -59,6 +57,7 @@ class _TabWebViewState extends ConsumerState<TabWebView> {
               _isLoading = false;
               _lastError = error;
             });
+            debugPrint('WebView error (${_currentRequest?.uri}): ${error.description}');
           },
         ),
       );
@@ -101,69 +100,74 @@ class _TabWebViewState extends ConsumerState<TabWebView> {
     return true;
   }
 
+  Future<void> _handleRefresh() async {
+    if (widget.request.hasError) {
+      await widget.onRequestRefresh();
+      return;
+    }
+    await _reloadCurrentRequest();
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final requestAsync = widget.request;
-    final canManuallyReload = requestAsync.hasValue || _currentRequest != null;
 
     return WillPopScope(
       onWillPop: _handleBackPressed,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.refresh),
-              tooltip: l10n.webviewRetryButton,
-              onPressed: canManuallyReload ? _reloadCurrentRequest : null,
-            ),
-          ],
-        ),
-        body: SafeArea(
-          child: requestAsync.when(
-            data: (request) {
-              _loadRequest(request);
-              return Stack(
-                children: [
-                  Positioned.fill(
-                    child: ColoredBox(
-                      color: Theme.of(context).colorScheme.surface,
-                      child: WebViewWidget(controller: _controller),
+      child: SafeArea(
+        child: RefreshIndicator.adaptive(
+          onRefresh: _handleRefresh,
+          edgeOffset: 8,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(parent: ClampingScrollPhysics()),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: requestAsync.when(
+                    data: (request) {
+                      _loadRequest(request);
+                      return Stack(
+                        children: [
+                          Positioned.fill(
+                            child: ColoredBox(
+                              color: Theme.of(context).colorScheme.surface,
+                              child: WebViewWidget(controller: _controller),
+                            ),
+                          ),
+                          if (_lastError != null)
+                            Positioned.fill(
+                              child: _WebViewErrorView(
+                                message: l10n.webviewErrorInlineMessage,
+                                hint: l10n.webviewPullToRefreshHint,
+                              ),
+                            ),
+                          Positioned(
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            child: AnimatedOpacity(
+                              opacity: _isLoading ? 1 : 0,
+                              duration: const Duration(milliseconds: 200),
+                              child: LinearProgressIndicator(
+                                value: _progress > 0 && _progress < 1 ? _progress : null,
+                                minHeight: 3,
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                    loading: () => const Center(child: CircularProgressIndicator()),
+                    error: (error, stackTrace) => _WebViewErrorView(
+                      message: l10n.webviewSettingsError,
+                      hint: l10n.webviewPullToRefreshHint,
                     ),
                   ),
-                  if (_lastError != null)
-                    Positioned.fill(
-                      child: _WebViewErrorView(
-                        title: l10n.webviewErrorTitle,
-                        message: l10n.webviewErrorMessage,
-                        buttonLabel: l10n.webviewRetryButton,
-                        onRetry: _reloadCurrentRequest,
-                      ),
-                    ),
-                  Positioned(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    child: AnimatedOpacity(
-                      opacity: _isLoading ? 1 : 0,
-                      duration: const Duration(milliseconds: 200),
-                      child: LinearProgressIndicator(
-                        value: _progress > 0 && _progress < 1 ? _progress : null,
-                        minHeight: 3,
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               );
             },
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, stackTrace) => _WebViewErrorView(
-              title: l10n.webviewErrorTitle,
-              message: l10n.webviewSettingsError,
-              buttonLabel: l10n.webviewRetryButton,
-              onRetry: widget.onRequestRefresh,
-            ),
           ),
         ),
       ),
@@ -173,20 +177,17 @@ class _TabWebViewState extends ConsumerState<TabWebView> {
 
 class _WebViewErrorView extends StatelessWidget {
   const _WebViewErrorView({
-    required this.title,
     required this.message,
-    required this.buttonLabel,
-    required this.onRetry,
+    required this.hint,
   });
 
-  final String title;
   final String message;
-  final String buttonLabel;
-  final VoidCallback onRetry;
+  final String hint;
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return ColoredBox(
       color: colorScheme.surface,
       child: Center(
@@ -204,21 +205,15 @@ class _WebViewErrorView extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  title,
+                  message,
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.titleLarge,
+                  style: theme.textTheme.titleMedium,
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  message,
+                  hint,
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-                const SizedBox(height: 24),
-                FilledButton.icon(
-                  onPressed: onRetry,
-                  icon: const Icon(Icons.refresh),
-                  label: Text(buttonLabel),
+                  style: theme.textTheme.bodyMedium,
                 ),
               ],
             ),
