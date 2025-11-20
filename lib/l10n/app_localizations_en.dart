@@ -308,6 +308,16 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errorIncorrectOtp => 'Incorrect OTP code.';
   @override
+  String get settings_load_error =>
+      'Could not load settings. Please try again.';
+  @override
+  String get terms_load_error =>
+      'Could not load terms and conditions. Please try again.';
+  @override
+  String get settings_retry => 'Retry loading settings';
+  @override
+  String get terms_retry => 'Retry loading terms';
+  @override
   String get errorGeneric => 'Something went wrong. Please try again.';
   @override
   String get error_bad_request => 'Bad request. Please double-check your data and try again.';

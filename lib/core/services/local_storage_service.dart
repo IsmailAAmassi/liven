@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -18,6 +20,10 @@ class LocalStorageService {
   static const _themeModeKey = 'theme_mode';
   static const _localeKey = 'locale';
   static const _notificationPromptDismissedKey = 'notification_prompt_dismissed';
+  static const _settingsCacheKey = 'settings_cache';
+  static const _termsCacheKey = 'terms_cache';
+  static const _settingsCacheUpdatedAtKey = 'settings_cache_updated_at';
+  static const _termsCacheUpdatedAtKey = 'terms_cache_updated_at';
 
   Future<void> setOnboardingCompleted(bool value) async {
     await _prefs.setBool(_onboardingKey, value);
@@ -77,6 +83,56 @@ class LocalStorageService {
 
   Future<void> clearAuth() async {
     await _prefs.remove(_authStatusKey);
+  }
+
+  Future<void> saveSettingsCache(Map<String, dynamic> data) async {
+    await _prefs.setString(_settingsCacheKey, jsonEncode(data));
+    await _prefs.setString(
+      _settingsCacheUpdatedAtKey,
+      DateTime.now().toIso8601String(),
+    );
+  }
+
+  Future<Map<String, dynamic>?> getSettingsCache() async {
+    final raw = _prefs.getString(_settingsCacheKey);
+    if (raw == null) {
+      return null;
+    }
+    try {
+      return jsonDecode(raw) as Map<String, dynamic>;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<DateTime?> getSettingsCacheUpdatedAt() async {
+    final timestamp = _prefs.getString(_settingsCacheUpdatedAtKey);
+    return timestamp != null ? DateTime.tryParse(timestamp) : null;
+  }
+
+  Future<void> saveTermsCache(Map<String, dynamic> data) async {
+    await _prefs.setString(_termsCacheKey, jsonEncode(data));
+    await _prefs.setString(
+      _termsCacheUpdatedAtKey,
+      DateTime.now().toIso8601String(),
+    );
+  }
+
+  Future<Map<String, dynamic>?> getTermsCache() async {
+    final raw = _prefs.getString(_termsCacheKey);
+    if (raw == null) {
+      return null;
+    }
+    try {
+      return jsonDecode(raw) as Map<String, dynamic>;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<DateTime?> getTermsCacheUpdatedAt() async {
+    final timestamp = _prefs.getString(_termsCacheUpdatedAtKey);
+    return timestamp != null ? DateTime.tryParse(timestamp) : null;
   }
 
   Future<void> setNotificationPromptDismissed(bool value) async {

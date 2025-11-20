@@ -307,6 +307,16 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get errorIncorrectOtp => 'رمز التحقق غير صحيح.';
   @override
+  String get settings_load_error =>
+      'تعذر تحميل الإعدادات. يرجى المحاولة مرة أخرى.';
+  @override
+  String get terms_load_error =>
+      'تعذر تحميل الشروط والأحكام. يرجى المحاولة مرة أخرى.';
+  @override
+  String get settings_retry => 'إعادة تحميل الإعدادات';
+  @override
+  String get terms_retry => 'إعادة تحميل الشروط';
+  @override
   String get errorGeneric => 'حدث خطأ ما، الرجاء المحاولة مرة أخرى.';
   @override
   String get error_bad_request => 'طلب غير صالح، يرجى التحقق من البيانات والمحاولة مجددًا.';

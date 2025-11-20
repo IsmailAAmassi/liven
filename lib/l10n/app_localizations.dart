@@ -168,6 +168,10 @@ abstract class AppLocalizations {
   String get errorIdentifierRequired;
   String get errorInvalidResetData;
   String get errorIncorrectOtp;
+  String get settings_load_error;
+  String get terms_load_error;
+  String get settings_retry;
+  String get terms_retry;
   String get errorGeneric;
   String get error_bad_request;
   String get error_unauthorized;
