@@ -16,7 +16,7 @@ class AppConfig {
   );
 
   static final bool useFakeSettings = _parseBool(
-    const String.fromEnvironment('USE_FAKE_SETTINGS', defaultValue: 'true'),
+    const String.fromEnvironment('USE_FAKE_SETTINGS', defaultValue: 'false'),
   );
 
   static bool _parseBool(String value) {
