@@ -244,6 +244,16 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get registerLoginCta => 'لديك حساب بالفعل؟ سجّل الدخول';
   @override
+  String get authRegisterSuccess => 'أهلاً بك في لايفن';
+  @override
+  String get authRegisterFailed =>
+      'تعذر إنشاء الحساب، حاول مرة أخرى.';
+  @override
+  String get authErrorPhoneTaken => 'رقم الجوال مسجل بالفعل.';
+  @override
+  String get authErrorPasswordTooShort =>
+      'كلمة المرور يجب أن تكون 6 أحرف على الأقل.';
+  @override
   String get forgotPasswordAppBar => 'نسيت كلمة المرور';
   @override
   String get forgotPasswordTitle => 'طلب رابط إعادة التعيين';
@@ -251,6 +261,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get sendOtpButton => 'إرسال الرمز';
   @override
   String get otpAppBar => 'أدخل رمز التحقق';
+  @override
+  String get otpEnterCodeMessage => 'أدخل رمز التحقق الذي وصلك.';
   @override
   String otpRegisterMessage(String identifier) =>
       'أرسلنا رمزًا إلى $identifier.';

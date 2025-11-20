@@ -141,10 +141,15 @@ abstract class AppLocalizations {
   String get registerTermsLink;
   String get registerButton;
   String get registerLoginCta;
+  String get authRegisterSuccess;
+  String get authRegisterFailed;
+  String get authErrorPhoneTaken;
+  String get authErrorPasswordTooShort;
   String get forgotPasswordAppBar;
   String get forgotPasswordTitle;
   String get sendOtpButton;
   String get otpAppBar;
+  String get otpEnterCodeMessage;
   String otpRegisterMessage(String identifier);
   String otpResetMessage(String identifier);
   String get verifyButton;

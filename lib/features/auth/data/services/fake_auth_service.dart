@@ -1,9 +1,9 @@
 import '../../../../core/network/api_result.dart';
 import '../../../../core/services/auth_storage.dart';
 import '../../../../core/utils/unit.dart';
-import '../../domain/entities/user.dart';
 import '../../domain/models/auth_result.dart';
 import '../../domain/models/auth_session.dart';
+import '../../domain/models/register_result.dart';
 import '../../domain/repositories/auth_repository.dart';
 
 class FakeAuthService implements AuthRepository {
@@ -33,23 +33,22 @@ class FakeAuthService implements AuthRepository {
   }
 
   @override
-  Future<AuthResult> register({
-    required String name,
-    required String email,
+  Future<RegisterResult> register({
+    required String phone,
     required String password,
+    required String name,
   }) async {
     await Future.delayed(const Duration(milliseconds: 800));
-    if (name.isEmpty || email.isEmpty || password.length < 6) {
-      return const ApiError(ApiFailure(messageKey: 'errorInvalidRegistration'));
+    if (phone == '0000000000') {
+      return const RegisterResult.failure(
+        errors: ['The phone has already been taken.'],
+        messageKey: 'error_validation',
+      );
     }
-    final user = User(id: '2', name: name, email: email);
-    final session = AuthSession(
-      token: _token,
-      userId: 2,
-      profileCompleted: true,
-    );
-    await _persistUserSession(user, session);
-    return ApiSuccess(session);
+    if (name.isEmpty || phone.isEmpty || password.length < 6) {
+      return const RegisterResult.failure(messageKey: 'errorInvalidRegistration');
+    }
+    return const RegisterResult.success(message: 'Registration successful');
   }
 
   @override
@@ -118,10 +117,5 @@ class FakeAuthService implements AuthRepository {
   Future<void> _persistSession(AuthSession session) async {
     await _storage.saveAuthToken(session.token);
     await _storage.saveUserId(session.userId);
-  }
-
-  Future<void> _persistUserSession(User user, AuthSession session) async {
-    await _persistSession(session);
-    await _storage.saveUser(user);
   }
 }

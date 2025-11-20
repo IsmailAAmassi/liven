@@ -9,6 +9,7 @@ import '../../../../core/utils/unit.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/models/auth_result.dart';
 import '../../domain/models/auth_session.dart';
+import '../../domain/models/register_result.dart';
 import '../../domain/repositories/auth_repository.dart';
 
 class RealAuthService implements AuthRepository {
@@ -60,20 +61,48 @@ class RealAuthService implements AuthRepository {
   }
 
   @override
-  Future<AuthResult> register({
-    required String name,
-    required String email,
+  Future<RegisterResult> register({
+    required String phone,
     required String password,
+    required String name,
   }) async {
-    final response = await _apiClient.post(_registerPath, body: {
-      'name': name,
-      'email': email,
-      'password': password,
-    });
-    if (response.isSuccessful) {
-      return await _handleAuthSuccess(response.data);
+    try {
+      final response = await _apiClient.post(_registerPath, body: {
+        'phone': phone,
+        'password': password,
+        'name': name,
+      });
+      if (response.isSuccessful) {
+        final payload = _parsePayload(response.data);
+        final status = payload['status'] == true;
+        if (status) {
+          return RegisterResult.success(message: payload['message'] as String?);
+        }
+        return RegisterResult.failure(
+          message: payload['message'] as String?,
+          messageKey: 'auth_register_failed',
+        );
+      }
+      if (response.statusCode == 422) {
+        final errors = _parseErrors(response.data);
+        return RegisterResult.failure(
+          errors: errors,
+          message: _extractMessage(response.data),
+          messageKey: 'error_validation',
+        );
+      }
+      final failure = _errorMapper.map(response.statusCode, response.data);
+      return RegisterResult.failure(
+        message: failure.details?['message'] as String?,
+        messageKey: failure.messageKey,
+      );
+    } on SocketException catch (_) {
+      return const RegisterResult.failure(messageKey: 'error_network');
+    } on TimeoutException catch (_) {
+      return const RegisterResult.failure(messageKey: 'error_network');
+    } catch (_) {
+      return const RegisterResult.failure(messageKey: 'auth_register_failed');
     }
-    return ApiError(_errorMapper.map(response.statusCode, response.data));
   }
 
   @override
@@ -175,6 +204,16 @@ class RealAuthService implements AuthRepository {
       return data;
     }
     return <String, dynamic>{};
+  }
+
+  List<String> _parseErrors(dynamic data) {
+    if (data is Map<String, dynamic>) {
+      final errors = data['errors'];
+      if (errors is List) {
+        return errors.whereType<String>().toList();
+      }
+    }
+    return const [];
   }
 
   Map<String, dynamic> _parseUser(Map<String, dynamic> payload) {

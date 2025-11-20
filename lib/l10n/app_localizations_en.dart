@@ -247,6 +247,16 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get registerLoginCta => 'Already have an account? Login';
   @override
+  String get authRegisterSuccess => 'You are new Liven person now';
+  @override
+  String get authRegisterFailed => 'Could not register. Please try again.';
+  @override
+  String get authErrorPhoneTaken =>
+      'This phone number is already registered.';
+  @override
+  String get authErrorPasswordTooShort =>
+      'Password must be at least 6 characters.';
+  @override
   String get forgotPasswordAppBar => 'Forgot password';
   @override
   String get forgotPasswordTitle => 'Request reset link';
@@ -254,6 +264,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sendOtpButton => 'Send OTP';
   @override
   String get otpAppBar => 'Enter OTP';
+  @override
+  String get otpEnterCodeMessage =>
+      'Enter the verification code you received.';
   @override
   String otpRegisterMessage(String identifier) =>
       'We have sent a code to $identifier.';
