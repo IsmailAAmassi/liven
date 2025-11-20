@@ -8,7 +8,7 @@ class AppConfig {
 
   static const String homeWebUrl = String.fromEnvironment(
     'APP_HOME_WEB_URL',
-    defaultValue: 'https://liven-sa.com/',
+    defaultValue: 'https://app.liven-sa.com/',
   );
 
   static final bool useFakeAuth = _parseBool(
