@@ -127,27 +127,6 @@ class AuthViewModel extends StateNotifier<AuthState> {
     );
   }
 
-  Future<void> verifyOtp(String code, OtpScreenArgs args) async {
-    state = const AuthState(isLoading: true);
-    final result = await _repository.verifyOtp(code);
-    final errorMessage = _errorFromResult(result);
-    if (errorMessage != null) {
-      state = state.copyWith(isLoading: false, errorMessage: errorMessage);
-      return;
-    }
-    state = const AuthState();
-    final router = _ref.read(appRouterProvider);
-    if (args.flowType == OtpFlowType.register) {
-      await _ref.read(authStatusProvider.notifier).setStatus(AuthStatus.authenticated);
-      router.go(MainScreen.routePath);
-    } else {
-      router.go(
-        ResetPasswordScreen.routePath,
-        extra: ResetPasswordArgs(identifier: args.identifier),
-      );
-    }
-  }
-
   Future<void> resetPassword({
     required String identifier,
     required String password,

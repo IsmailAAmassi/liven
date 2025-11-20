@@ -142,6 +142,19 @@
       }
     }
   },
+  "otpInvalid": "Invalid OTP.",
+  "otpRequired": "Please enter the OTP.",
+  "otpSentMessage": "OTP has been sent to your mobile.",
+  "otpInvalidMobile": "Invalid mobile number.",
+  "otpGenericError": "Could not verify the OTP. Please try again.",
+  "otpResendInXSeconds": "Resend in {seconds}s",
+  "@otpResendInXSeconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
   "verifyButton": "Verify",
   "resetPasswordAppBar": "Reset password",
   "resetPasswordButton": "Reset password",

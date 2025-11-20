@@ -142,6 +142,19 @@
       }
     }
   },
+  "otpInvalid": "رمز التحقق غير صحيح.",
+  "otpRequired": "يرجى إدخال رمز التحقق.",
+  "otpSentMessage": "تم إرسال رمز التحقق إلى هاتفك.",
+  "otpInvalidMobile": "رقم الجوال غير صالح.",
+  "otpGenericError": "تعذر التحقق من الرمز. حاول مرة أخرى.",
+  "otpResendInXSeconds": "إعادة الإرسال خلال {seconds} ث",
+  "@otpResendInXSeconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
   "verifyButton": "تحقق",
   "resetPasswordAppBar": "إعادة تعيين كلمة المرور",
   "resetPasswordButton": "إعادة التعيين",

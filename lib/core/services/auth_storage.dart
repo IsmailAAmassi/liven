@@ -17,6 +17,8 @@ class AuthStorage {
   static const _tokenKey = 'auth_token';
   static const _userKey = 'auth_user';
   static const _userIdKey = 'auth_user_id';
+  static const _userPhoneKey = 'auth_user_phone';
+  static const _profileCompletedKey = 'auth_profile_completed';
 
   Future<void> saveAuthToken(String token) async {
     await _prefs.setString(_tokenKey, token);
@@ -40,6 +42,30 @@ class AuthStorage {
 
   Future<void> clearUserId() async {
     await _prefs.remove(_userIdKey);
+  }
+
+  Future<void> saveUserPhone(String phone) async {
+    await _prefs.setString(_userPhoneKey, phone);
+  }
+
+  Future<String?> getUserPhone() async {
+    return _prefs.getString(_userPhoneKey);
+  }
+
+  Future<void> clearUserPhone() async {
+    await _prefs.remove(_userPhoneKey);
+  }
+
+  Future<void> saveProfileCompleted(bool value) async {
+    await _prefs.setBool(_profileCompletedKey, value);
+  }
+
+  Future<bool?> getProfileCompleted() async {
+    return _prefs.getBool(_profileCompletedKey);
+  }
+
+  Future<void> clearProfileCompleted() async {
+    await _prefs.remove(_profileCompletedKey);
   }
 
   Future<void> saveUser(User user) async {
@@ -68,6 +94,8 @@ class AuthStorage {
       clearAuthToken(),
       clearUser(),
       clearUserId(),
+      clearUserPhone(),
+      clearProfileCompleted(),
     ]);
   }
 }

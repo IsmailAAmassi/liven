@@ -270,6 +270,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String otpResetMessage(String identifier) =>
       'تحقق من طلب إعادة التعيين لـ $identifier.';
   @override
+  String get otpInvalid => 'رمز التحقق غير صحيح.';
+  @override
+  String get otpRequired => 'يرجى إدخال رمز التحقق.';
+  @override
+  String get otpSentMessage => 'تم إرسال رمز التحقق إلى هاتفك.';
+  @override
+  String get otpInvalidMobile => 'رقم الجوال غير صالح.';
+  @override
+  String get otpGenericError => 'تعذر التحقق من الرمز. حاول مرة أخرى.';
+  @override
+  String otpResendInXSeconds(int seconds) => 'إعادة الإرسال خلال ${seconds} ث';
+  @override
   String get verifyButton => 'تحقق';
   @override
   String get resetPasswordAppBar => 'إعادة تعيين كلمة المرور';

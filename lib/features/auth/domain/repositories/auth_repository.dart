@@ -1,6 +1,8 @@
 import '../../../../core/network/api_result.dart';
 import '../entities/user.dart';
 import '../models/auth_result.dart';
+import '../models/otp_send_result.dart';
+import '../models/otp_verify_result.dart';
 import '../models/register_result.dart';
 
 abstract interface class AuthRepository {
@@ -18,7 +20,12 @@ abstract interface class AuthRepository {
 
   Future<EmptyResult> requestPasswordReset(String identifier);
 
-  Future<EmptyResult> verifyOtp(String code);
+  Future<OtpVerifyResult> verifyOtp({
+    required String phone,
+    required String otpCode,
+  });
+
+  Future<OtpSendResult> sendOtp({required String phone});
 
   Future<EmptyResult> resetPassword({
     required String identifier,

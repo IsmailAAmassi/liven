@@ -3,6 +3,8 @@ import '../../../../core/services/auth_storage.dart';
 import '../../../../core/utils/unit.dart';
 import '../../domain/models/auth_result.dart';
 import '../../domain/models/auth_session.dart';
+import '../../domain/models/otp_send_result.dart';
+import '../../domain/models/otp_verify_result.dart';
 import '../../domain/models/register_result.dart';
 import '../../domain/repositories/auth_repository.dart';
 
@@ -61,12 +63,38 @@ class FakeAuthService implements AuthRepository {
   }
 
   @override
-  Future<EmptyResult> verifyOtp(String code) async {
+  Future<OtpVerifyResult> verifyOtp({
+    required String phone,
+    required String otpCode,
+  }) async {
     await Future.delayed(const Duration(milliseconds: 400));
-    if (code != '123456') {
-      return const ApiError(ApiFailure(messageKey: 'errorIncorrectOtp'));
+    if (otpCode != '123456') {
+      return const OtpVerifyResult.failure(messageKey: 'errorIncorrectOtp');
     }
-    return const ApiSuccess(Unit.instance);
+    final session = AuthSession(
+      token: _token,
+      userId: 1,
+      profileCompleted: true,
+    );
+    await _persistSession(session);
+    await _storage.saveUserPhone(phone);
+    await _storage.saveProfileCompleted(true);
+    return const OtpVerifyResult.success(
+      userId: 1,
+      token: _token,
+      phone: '0123456789',
+      profileCompleted: true,
+      message: 'success',
+    );
+  }
+
+  @override
+  Future<OtpSendResult> sendOtp({required String phone}) async {
+    await Future.delayed(const Duration(milliseconds: 400));
+    if (phone.isEmpty) {
+      return const OtpSendResult.failure(messageKey: 'otp_required');
+    }
+    return const OtpSendResult.success(message: 'OTP has been sent for your mobile');
   }
 
   @override
@@ -100,7 +128,7 @@ class FakeAuthService implements AuthRepository {
       userId: id,
       profileCompleted: true,
     );
-    await _storage.saveAuthToken(_token);
+    await _persistSession(session);
     return ApiSuccess(session);
   }
 
@@ -117,5 +145,6 @@ class FakeAuthService implements AuthRepository {
   Future<void> _persistSession(AuthSession session) async {
     await _storage.saveAuthToken(session.token);
     await _storage.saveUserId(session.userId);
+    await _storage.saveProfileCompleted(session.profileCompleted);
   }
 }
