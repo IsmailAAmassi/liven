@@ -84,7 +84,11 @@ class LocalStorageService {
   }
 
   Future<void> clearAuth() async {
-    await _prefs.remove(_authStatusKey);
+    await Future.wait([
+      _prefs.remove(_authStatusKey),
+      _prefs.remove(_completeProfileLastPromptKey),
+      _prefs.remove(_notificationPromptDismissedKey),
+    ]);
   }
 
   Future<void> saveSettingsCache(Map<String, dynamic> data) async {

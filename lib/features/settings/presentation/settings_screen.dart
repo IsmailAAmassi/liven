@@ -6,7 +6,7 @@ import '../../../core/config/app_providers.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/widgets/app_page_app_bar.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../auth/presentation/auth_view_model.dart';
+import '../../auth/application/logout_controller.dart';
 import '../../auth/presentation/widgets/logout_confirmation_dialog.dart';
 import '../../main/presentation/main_screen.dart';
 import '../../terms/presentation/terms_of_use_screen.dart';
@@ -25,6 +25,7 @@ class SettingsScreen extends ConsumerWidget {
     final themeMode = ref.watch(themeModeProvider);
     final locale = ref.watch(localeProvider);
     final router = ref.read(appRouterProvider);
+    final logoutController = ref.read(logoutControllerProvider);
     final language = AppLanguageX.fromLocale(locale);
     final theme = ThemePreferenceX.fromThemeMode(themeMode);
 
@@ -59,11 +60,14 @@ class SettingsScreen extends ConsumerWidget {
           const Divider(),
           ListTile(
             leading: const Icon(Icons.logout),
-            title: Text(l10n.settingsLogoutLabel),
+            title: Text(l10n.logout),
             onTap: () async {
               final confirmed = await showLogoutConfirmationDialog(context);
               if (confirmed) {
-                await ref.read(authViewModelProvider.notifier).logout();
+                await logoutController.logout(
+                  context: context,
+                  showMessage: true,
+                );
               }
             },
           ),

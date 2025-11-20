@@ -1,4 +1,3 @@
-import '../../../../core/network/api_result.dart';
 import '../entities/user.dart';
 import '../models/auth_result.dart';
 import '../models/otp_send_result.dart';
@@ -36,7 +35,7 @@ abstract interface class AuthRepository {
     required String passwordConfirmation,
   });
 
-  Future<EmptyResult> logout();
+  Future<void> logout();
 
   Future<AuthResult> refreshToken();
 
