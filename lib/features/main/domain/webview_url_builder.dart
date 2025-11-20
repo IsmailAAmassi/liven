@@ -56,12 +56,16 @@ Uri _buildWebUri({
   final resolvedUri = path != null && path.isNotEmpty
       ? baseUri.resolve(path)
       : baseUri;
+
+  final normalizedUri = resolvedUri.path.isEmpty
+      ? resolvedUri.replace(path: '/')
+      : resolvedUri;
   final mergedQuery = {
-    ...resolvedUri.queryParameters,
+    ...normalizedUri.queryParameters,
     if (queryParameters != null) ...queryParameters,
   };
 
-  return resolvedUri.replace(
+  return normalizedUri.replace(
     queryParameters: mergedQuery.isEmpty ? null : mergedQuery,
   );
 }
