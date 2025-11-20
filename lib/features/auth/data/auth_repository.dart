@@ -13,11 +13,9 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
   if (AppConfig.useFakeAuth) {
     return FakeAuthService(storage: storage);
   }
-  final apiClient = ref.watch(apiClientProvider);
-  final mapper = ref.watch(apiErrorMapperProvider);
+  final api = ref.watch(appApiProvider);
   return RealAuthService(
-    apiClient: apiClient,
+    api: api,
     storage: storage,
-    errorMapper: mapper,
   );
 });

@@ -1,4 +1,5 @@
 import '../utils/unit.dart';
+import 'api_exceptions.dart';
 
 sealed class ApiResult<T> {
   const ApiResult();
@@ -7,14 +8,13 @@ sealed class ApiResult<T> {
 
   R when<R>({
     required R Function(T data) success,
-    required R Function(ApiFailure failure) failure,
+    required R Function(ApiException error) failure,
   }) {
     if (this is ApiSuccess<T>) {
-      final result = this as ApiSuccess<T>;
-      return success(result.data);
+      return success((this as ApiSuccess<T>).data);
     }
     final error = this as ApiError<T>;
-    return failure(error.failure);
+    return failure(error.error);
   }
 }
 
@@ -25,21 +25,21 @@ class ApiSuccess<T> extends ApiResult<T> {
 }
 
 class ApiError<T> extends ApiResult<T> {
-  const ApiError(this.failure);
+  const ApiError(this.error);
 
-  final ApiFailure failure;
+  final ApiException error;
 }
 
-class ApiFailure {
+class ApiFailure extends ApiException {
   const ApiFailure({
-    this.statusCode,
-    required this.messageKey,
-    this.details,
+    super.statusCode,
+    super.messageKey = 'error_unknown',
+    super.message,
+    super.messageAr,
+    super.messageEn,
+    super.errors,
+    super.fieldErrors,
   });
-
-  final int? statusCode;
-  final String messageKey;
-  final Map<String, dynamic>? details;
 }
 
 typedef EmptyResult = ApiResult<Unit>;
