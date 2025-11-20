@@ -5,11 +5,14 @@ import 'app.dart';
 import 'core/config/app_providers.dart';
 import 'core/services/auth_storage.dart';
 import 'core/services/local_storage_service.dart';
+import 'core/utils/app_logger.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final storage = await LocalStorageService.create();
   final authStorage = await AuthStorage.create();
+
+  appLogger.i('Initializing Liven application');
 
   runApp(
     ProviderScope(
