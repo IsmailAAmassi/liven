@@ -13,6 +13,7 @@
   "webviewErrorTitle": "Can't load content",
   "webviewErrorMessage": "We couldn't load the Liven web experience. Check your connection and try again.",
   "webviewConfigError": "We're missing the home web URL. Verify APP_HOME_WEB_URL in your environment.",
+  "webviewSettingsError": "We couldn't load the page URL from settings. Refresh and try again.",
   "webviewRetryButton": "Try again",
   "homeWelcomeTitle": "Hello there 👋",
   "homeWelcomeSubtitle": "Switch languages, toggle the theme, and manage security from settings.",

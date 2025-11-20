@@ -33,6 +33,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get webviewConfigError =>
       'عنوان الصفحة غير مهيأ. تأكد من قيمة ‎APP_HOME_WEB_URL‎ في الإعدادات.';
   @override
+  String get webviewSettingsError =>
+      'تعذّر تحميل رابط الصفحة من الإعدادات. حدّث البيانات وحاول مجددًا.';
+  @override
   String get webviewRetryButton => 'إعادة المحاولة';
   @override
   String get homeWelcomeTitle => 'مرحبًا 👋';
