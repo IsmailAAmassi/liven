@@ -31,7 +31,7 @@ class AppLocalizationsEn extends AppLocalizations {
       "We couldn't load the Liven web experience. Check your connection and try again.";
   @override
   String get webviewConfigError =>
-      "We're missing the home web URL. Verify APP_HOME_WEB_URL in your environment.";
+      "We're missing the home web URL. Verify APP_WEB_APP_URL in your environment.";
   @override
   String get webviewSettingsError =>
       "We couldn't load the page URL from settings. Refresh and try again.";

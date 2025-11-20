@@ -31,7 +31,7 @@ class AppLocalizationsAr extends AppLocalizations {
       'لم نتمكن من تحميل تجربة ليفن عبر الويب. تأكد من اتصالك ثم أعد المحاولة.';
   @override
   String get webviewConfigError =>
-      'عنوان الصفحة غير مهيأ. تأكد من قيمة ‎APP_HOME_WEB_URL‎ في الإعدادات.';
+      'عنوان الصفحة غير مهيأ. تأكد من قيمة ‎APP_WEB_APP_URL‎ في الإعدادات.';
   @override
   String get webviewSettingsError =>
       'تعذّر تحميل رابط الصفحة من الإعدادات. حدّث البيانات وحاول مجددًا.';
